@@ -1,0 +1,19 @@
+<app-modal-archetype (dismissed)="onDismiss()">
+    <ng-container class="modal-title-content">Choose network</ng-container>
+    <ng-container class="modal-body-content">
+
+        <label class="d-flex flex-column gap-2">
+            <div class="fw-bold">Select network</div>
+            <select #selector class="form-select form-select-sm">
+                <option *ngFor="let rpc of rpcs; index as i;" [value]="i">
+                    {{ rpc.networkName }}
+                </option>
+            </select>
+        </label>
+
+    </ng-container>
+    <ng-container class="modal-footer-content">
+        <button type="button" class="btn btn-secondary" (click)="onDismiss()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="onResolve(selector.value)">Confirm</button>
+    </ng-container>
+</app-modal-archetype>

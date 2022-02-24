@@ -1,0 +1,29 @@
+<app-modal-archetype (dismissed)="onDismiss()">
+    <ng-container class="modal-title-content">Polkadot - Choose account & network</ng-container>
+    <ng-container class="modal-body-content">
+
+        <div class="mb-4">
+            <span>To connect to the Reef chain you need to pair your Polkadot address. If you didn't bind already, then follow the tutorial <a href="https://freddycorly.medium.com/create-your-reef-chain-account-6b06ad323c6" target="_blank">Create your Reef chain account</a></span>
+        </div>
+
+        <label class="d-flex flex-column gap-2 mb-4">
+            <div class="fw-bold">Select account</div>
+            <select #accountSelector class="form-select form-select-sm">
+                <option *ngFor="let a of data?.accounts" [value]="a.address">({{ a?.meta.name }}) {{ a.address }}</option>
+            </select>
+        </label>
+
+        <label class="d-flex flex-column gap-2">
+            <div class="fw-bold">Select network</div>
+            <select #networkSelector class="form-select form-select-sm">
+                <option value="wss://rpc-testnet.reefscan.com/ws;reef-testnet">Reef Testnet</option>
+                <option value="wss://rpc.reefscan.com/ws;reef-mainnet">Reef Mainnet</option>
+            </select>
+        </label>
+
+    </ng-container>
+    <ng-container class="modal-footer-content">
+        <button type="button" class="btn btn-secondary" (click)="onDismiss()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="onResolve(accountSelector, networkSelector)">Confirm</button>
+    </ng-container>
+</app-modal-archetype>

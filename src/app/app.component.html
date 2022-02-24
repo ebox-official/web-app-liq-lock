@@ -1,0 +1,16 @@
+<app-header (isDarkmodeChanged)="setBackground($event)"></app-header>
+<div #appBody class="app-body">
+  <div class="centered-content-wrapper">
+    <app-sidebar></app-sidebar>
+    <div class="content">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>
+<app-tapbar></app-tapbar>
+
+<app-modals></app-modals>
+<app-toaster></app-toaster>
+<app-loading-indicator [uniqueId]="'base'"></app-loading-indicator>
+
+<app-unsupported-network-overlay></app-unsupported-network-overlay>

@@ -1,0 +1,13 @@
+.card {
+    max-height: 100%;
+}
+
+@media screen and (max-width: 768px) {
+    .card {
+        height: 100%;
+    }
+
+    .card, .card-header, .card-footer {
+        border-radius: 0;
+    }
+}

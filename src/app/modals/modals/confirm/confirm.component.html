@@ -1,0 +1,9 @@
+<app-modal-archetype (dismissed)="onDismiss()">
+    <ng-container class="modal-title-content">Confirm</ng-container>
+    <ng-container class="modal-body-content">{{ data.message }}</ng-container>
+    <ng-container class="modal-footer-content">
+        <button type="button" class="btn btn-secondary" (click)="onDismiss()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="onResolve()">Confirm</button>
+    </ng-container>
+</app-modal-archetype>
+

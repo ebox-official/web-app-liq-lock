@@ -1,0 +1,26 @@
+:root {
+  --bs-body-rgb-alt: var(--bs-body-bg-rgb-alt); /* Fix Bootstrap-Nightshade missing variable */
+  --navbar-height: 64px;
+}
+
+::-webkit-scrollbar-track,
+html.dark ::-webkit-scrollbar-track {
+  box-shadow: inset -1px 0 0.3em #fff3, inset 1px 0 0.3em #0003;
+}
+html.dark ::-webkit-scrollbar-track,
+html.dark ::-webkit-scrollbar-track {
+  background-color: var(--bs-body-bg-alt);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  background-color: var(--bs-body-bg);
+}
+html.dark ::-webkit-scrollbar {
+  background-color: var(--bs-body-bg-alt);
+}
+
+::-webkit-scrollbar-thumb,
+html.dark ::-webkit-scrollbar-thumb {
+  background-color: var(--bs-primary);
+}

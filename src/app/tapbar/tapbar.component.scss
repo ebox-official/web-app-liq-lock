@@ -1,0 +1,10 @@
+.nav-link {
+    line-height: 1rem;
+    font-size: 1rem;
+    padding: calc((var(--navbar-height) - 1rem) / 2);
+}
+
+.nav-link.active {
+    background-color: var(--bs-primary);
+    color: var(--bs-light);
+}

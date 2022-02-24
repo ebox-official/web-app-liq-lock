@@ -1,0 +1,18 @@
+<div #modal class="modal fade" data-bs-keyboard="false" tabindex="-1" aria-hidden="true" (click)="checkClick($event)">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content" style="box-shadow: 0 0 1000px 1000px #0007">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <ng-content select=".modal-title-content"></ng-content>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="emitDismiss()"></button>
+            </div>
+            <div class="modal-body">
+                <ng-content select=".modal-body-content"></ng-content>
+            </div>
+            <div class="modal-footer">
+                <ng-content select=".modal-footer-content"></ng-content>
+            </div>
+        </div>
+    </div>
+</div>

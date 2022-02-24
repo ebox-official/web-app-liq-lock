@@ -1,0 +1,68 @@
+<app-card-archetype>
+    <ng-container class="card-header-content">Homepage</ng-container>
+    <ng-container class="card-body-content">
+        <div class="p-3">
+            <h4 class="card-title">Welcome to the ebox Liquidity Locker!</h4>
+            <p class="card-text">Lock your tokens (normal ones or liquidity pool tokens) for a certain amount of time! <br> Doesn't sound amazing but it really is, read below why.</p>
+
+            <div class="mb-4">
+                <h5>Frequently Asked Questions</h5>
+                <div class="accordion" id="accordionExample">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
+                                aria-expanded="false" aria-controls="collapseOne">
+                                What is token locking?
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
+                            data-bs-parent="#accordionExample">
+                            <div class="accordion-body">
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus ad veniam veritatis quo ratione magni quam odio molestiae dolorem deleniti soluta saepe a, voluptatum quidem quasi ducimus quia aut accusantium!
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                Why it's so important?
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+                            data-bs-parent="#accordionExample">
+                            <div class="accordion-body">
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem omnis quibusdam similique tenetur temporibus veniam recusandae adipisci illo minus voluptatem. Id quo accusantium veniam, facere voluptas cum tempore et eveniet.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                How this dapp locks your tokens?
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
+                            data-bs-parent="#accordionExample">
+                            <div class="accordion-body">
+                                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ex delectus consectetur officia odio repudiandae. Eligendi dignissimos, reiciendis mollitia optio repellat quo neque voluptate, esse nisi est perferendis tenetur beatae illum!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h5>What can you do?</h5>
+            <div class="d-inline-flex gap-2 list-of-actions">
+                <a [routerLink]="['/lock-list']" class="btn btn-primary"><i class="bi bi-card-list me-2"></i>See locks</a>
+                <a href="#" class="btn btn-primary"><i class="bi bi-lock-fill me-2"></i>Create lock</a>
+                <a href="#" class="btn btn-primary"><i class="bi bi-pen me-2"></i>Edit lock</a>
+                <a href="#" class="btn btn-primary"><i class="bi bi-unlock-fill me-2"></i>Withdraw lock</a>
+            </div>
+        </div>
+    </ng-container>
+    <ng-container class="card-footer-content">
+        <app-copyright></app-copyright>
+    </ng-container>
+</app-card-archetype>

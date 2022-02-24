@@ -1,0 +1,39 @@
+.ground {
+    position: absolute;
+    z-index: 100;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #0007;
+}
+
+.figure {
+    width: 30vw;
+    height: 30vw;
+    border: 8vw solid var(--bs-primary);
+    animation-name: Rotate;
+    animation-duration: 4s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+@keyframes Rotate {
+    0% {
+        transform: rotateZ(0);
+    }
+    100% {
+        transform: rotateZ(360deg);
+    }
+}
+
+@media screen and (min-width: 1024px) {
+    .figure {
+        width: 20vw;
+        height: 20vw;
+        border: 5vw solid var(--bs-primary);
+    }
+}

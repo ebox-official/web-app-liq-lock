@@ -1,0 +1,10 @@
+<ng-container *ngIf="!(connectService.isConnected$ | async); else connected">
+    <div class="p-3">
+        <h5>You don't seem to be connected.</h5>
+        <p>Please connect your wallet to access this page <a [routerLink]="['/connect']" [queryParams]="{ returnUrl: router.url }" class="btn btn-sm btn-primary"><i class="bi bi-box-arrow-in-right me-2"></i>Connect</a></p>
+    </div>
+</ng-container>
+
+<ng-template #connected>
+    YAY!
+</ng-template>

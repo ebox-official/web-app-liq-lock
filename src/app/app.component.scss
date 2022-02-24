@@ -1,0 +1,46 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+app-header {
+    min-height: var(--navbar-height);
+}
+
+.content {
+    width: 768px;
+}
+
+.app-body {
+    padding: 2rem;
+    height: calc(100vh - var(--navbar-height));
+    background-size: cover;
+}
+
+.centered-content-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    max-height: 100%;
+}
+
+@media screen and (max-width: 768px) {
+    .content {
+        width: 100%;
+    }
+
+    .app-body {
+        padding: 0;
+        height: calc(100vh - 128px);
+    }
+
+    .centered-content-wrapper {
+        gap: 0;
+        height: 100%;
+    }
+
+    app-tapbar {
+        height: 64px;
+    }
+}

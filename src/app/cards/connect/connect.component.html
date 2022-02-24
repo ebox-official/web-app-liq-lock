@@ -1,0 +1,55 @@
+<app-card-archetype>
+    <ng-container class="card-header-content">Connect your wallet</ng-container>
+    <ng-container class="card-body-content">
+
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item" (click)="connect('INJECTED')">
+                <div class="wallet-icon-wrapper">
+                    <img *ngIf="headerService.isDarkmode$ | async" height="48" src="assets/img/wallet/in-wallet-dark.svg" alt="in-wallet logo">
+                    <img *ngIf="!(headerService.isDarkmode$ | async)" height="48" src="assets/img/wallet/in-wallet.svg" alt="in-wallet logo">
+                </div>
+                <span>In-wallet Provider</span>
+            </li>
+            <li class="list-group-item" (click)="connect('BINANCE_CHAIN')">
+                <div class="wallet-icon-wrapper">
+                    <img height="48" src="assets/img/wallet/binance.svg" alt="binance chain wallet logo">
+                </div>
+                <span>Binance Chain Wallet</span>
+            </li>
+            <li class="list-group-item" (click)="connect('COINBASE')">
+                <div class="wallet-icon-wrapper">
+                    <img height="48" src="assets/img/wallet/coinbase.svg" alt="coinbase wallet logo">
+                </div>
+                <span>Coinbase</span>
+            </li>
+            <li class="list-group-item" (click)="connect('FORTMATIC')">
+                <div class="wallet-icon-wrapper">
+                    <img height="36" src="assets/img/wallet/fortmatic.svg" alt="fortmatic wallet logo">
+                </div>
+                <span>Fortmatic</span>
+            </li>
+            <li class="list-group-item" (click)="connect('METAMASK')">
+                <div class="wallet-icon-wrapper">
+                    <img height="48" src="assets/img/wallet/metamask.svg" alt="metamask wallet logo">
+                </div>
+                <span>MetaMask Wallet</span>
+            </li>
+            <li class="list-group-item" (click)="connect('POLKADOT')">
+                <div class="wallet-icon-wrapper">
+                    <img height="48" src="assets/img/wallet/polkadot.svg" alt="polkadot wallet logo">
+                </div>
+                <span>Polkadot</span>
+            </li>
+            <li class="list-group-item" (click)="connect('WALLETCONNECT')">
+                <div class="wallet-icon-wrapper">
+                    <img height="48" src="assets/img/wallet/walletconnect.svg" alt="walletconnect wallet logo">
+                </div>
+                <span>WalletConnet</span>
+            </li>
+        </ul>
+
+    </ng-container>
+    <ng-container class="card-footer-content">
+        <app-copyright></app-copyright>
+    </ng-container>
+</app-card-archetype>
