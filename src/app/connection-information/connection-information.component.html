@@ -1,0 +1,18 @@
+<ng-container *ngIf="!(connectService.isConnected$ | async); else connected">
+    You are not connected.
+</ng-container>
+
+<ng-template #connected>
+    <ul class="list-inline m-0">
+        <li class="list-inline-item">
+            <span class="fw-bold">Address</span> {{ connectService.selectedAccount$ | async | ellipsis: 10 }}
+        </li>
+        <li class="list-inline-item">
+            <span class="fw-bold">Network</span> {{ connectService.chainId$ | async }}
+        </li>
+        <li class="list-inline-item">
+            <span class="fw-bold">Base token</span> {{ connectService.baseTokenBalance$ | async | formatMultiplier }}
+        </li>
+    </ul>
+    
+</ng-template>

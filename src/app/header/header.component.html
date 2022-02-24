@@ -39,7 +39,7 @@
                 <li>
                     <a *ngIf="!(connectService.isConnected$ | async)"
                         class="btn btn-outline-primary"
-                        [routerLink]="['/connect']"><i class="bi bi-box-arrow-in-right me-2"></i>Connect</a>
+                        [routerLink]="['/connect']" [queryParams]="{ returnUrl: router.url }"><i class="bi bi-box-arrow-in-right me-2"></i>Connect</a>
                     <a *ngIf="connectService.isConnected$ | async"
                         class="btn btn-primary"
                         (click)="connectService.disconnect()"><i class="bi bi-box-arrow-left me-2"></i>Disconnect</a>

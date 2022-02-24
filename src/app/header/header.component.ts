@@ -1,4 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Router } from '@angular/router';
 import { ConnectService } from '../cards/connect/connect.service';
 import { HeaderService } from './header.service';
 
@@ -15,6 +16,7 @@ export class HeaderComponent implements OnInit {
 
   constructor(
     public connectService: ConnectService,
+    public router: Router,
     private headerService: HeaderService
   ) { }
 

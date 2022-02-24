@@ -5,7 +5,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class FormatMultiplierPipe implements PipeTransform {
 
-  transform(value: number, res: number = 2): unknown {
+  transform(value: any, res: number = 2): unknown {
 
     if (value === null || value === undefined) return "-";
 
@@ -44,7 +44,7 @@ export class FormatMultiplierPipe implements PipeTransform {
     }
 
     // Get a single digit number
-    let singleDigit: string | number = (m) ? value / 10**e : value;
+    let singleDigit: any = (m) ? value / 10**e : value;
 
     // Trim to the desired resolution
     if (/\./.test(singleDigit+"")) singleDigit = singleDigit.toFixed(res);

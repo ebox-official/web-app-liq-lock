@@ -29,6 +29,7 @@ import { CopyrightComponent } from './copyright/copyright.component';
 import { LockListComponent } from './cards/lock-list/lock-list.component';
 import { LockListPersonalComponent } from './cards/lock-list-personal/lock-list-personal.component';
 import { LockListGeneralComponent } from './cards/lock-list-general/lock-list-general.component';
+import { ConnectionInformationComponent } from './connection-information/connection-information.component';
 
 @NgModule({
   declarations: [
@@ -58,7 +59,8 @@ import { LockListGeneralComponent } from './cards/lock-list-general/lock-list-ge
     CopyrightComponent,
     LockListComponent,
     LockListPersonalComponent,
-    LockListGeneralComponent
+    LockListGeneralComponent,
+    ConnectionInformationComponent
   ],
   imports: [
     BrowserModule,
