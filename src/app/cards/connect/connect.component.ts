@@ -31,9 +31,9 @@ export class ConnectComponent implements OnInit {
       return;
     }
     this.toasterService.publish(ToastColor.success, "Connected successfully!");
-    setTimeout(() => {
-      this.router.navigateByUrl(this.route.snapshot.queryParamMap.get("returnUrl") || "/home");
-    }, 450);
+    setTimeout(() =>
+      this.router.navigateByUrl(this.route.snapshot.queryParamMap.get("returnUrl") || "/home")
+    , 450);
   }
 
 }

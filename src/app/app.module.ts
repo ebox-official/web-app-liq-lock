@@ -30,6 +30,15 @@ import { LockListComponent } from './cards/lock-list/lock-list.component';
 import { LockListPersonalComponent } from './cards/lock-list-personal/lock-list-personal.component';
 import { LockListGeneralComponent } from './cards/lock-list-general/lock-list-general.component';
 import { ConnectionInformationComponent } from './connection-information/connection-information.component';
+import { LockListItemComponent } from './cards/lock-list/lock-list-item/lock-list-item.component';
+import { LockComponent } from './cards/lock-list/lock/lock.component';
+import { CreateLockComponent } from './cards/create-lock/create-lock.component';
+import { EditLockComponent } from './cards/edit-lock/edit-lock.component';
+import { WithdrawLockComponent } from './cards/withdraw-lock/withdraw-lock.component';
+import { PleaseConnectComponent } from './cards/please-connect/please-connect.component';
+import { WeiToDecimalPipe } from './pipes/wei-to-decimal.pipe';
+import { DecimalToWeiPipe } from './pipes/decimal-to-wei.pipe';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -60,10 +69,19 @@ import { ConnectionInformationComponent } from './connection-information/connect
     LockListComponent,
     LockListPersonalComponent,
     LockListGeneralComponent,
-    ConnectionInformationComponent
+    ConnectionInformationComponent,
+    LockListItemComponent,
+    LockComponent,
+    CreateLockComponent,
+    EditLockComponent,
+    WithdrawLockComponent,
+    PleaseConnectComponent,
+    WeiToDecimalPipe,
+    DecimalToWeiPipe
   ],
   imports: [
     BrowserModule,
+    ReactiveFormsModule,
     AppRoutingModule
   ],
   providers: [],

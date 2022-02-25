@@ -6,6 +6,8 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { ProvidersService } from './providers.service';
 import { ToastColor, ToasterService } from 'src/app/toaster/toaster.service';
 import { NETWORK_MAP } from 'src/app/data/providers';
+import { ADDRESS_ZERO, MAX_VALUE } from 'src/app/data/constants';
+import { ERC20_ABI } from 'src/app/data/abis';
 
 const LS_KEY = "EBOX_CACHED_PROVIDER";
 const SYNC_RATE = 1000;
@@ -117,13 +119,66 @@ export class ConnectService {
   }
 
   // ethers.utils.formatUnits(wei, decimals)
-  weiToDecimal(wei: BigNumber|string, decimals: string|number): string {
-    return this.ethers.utils.formatUnits(wei, decimals);
+  weiToDecimal(wei: string, decimals: string|number): string {
+    return this.ethers.utils.formatUnits(wei, decimals).toString();
   }
 
   // ethers.utils.parseUnits(decimalString , decimals)
-  decimalToWei(decimalString: string, decimals: string|number): BigNumber {
-    return this.ethers.utils.parseUnits(decimalString , decimals);
+  decimalToWei(decimalString: string, decimals: string|number): string {
+    return this.ethers.utils.parseUnits(decimalString , decimals).toString();
+  }
+
+  // Get symbol, name, # of decimals and wei balance (read only query)
+  async getTokenInfo(tokenAddress: string) {
+
+    const provider = this.provider$.getValue();
+    const contract = new this.ethers.Contract(tokenAddress, ERC20_ABI, provider);
+
+    const [
+      symbol,
+      name,
+      decimals,
+      balance
+    ] = await Promise.all([
+      contract.symbol(),
+      contract.name(),
+      contract.decimals(),
+      this.getTokenBalance(tokenAddress)
+    ]);
+
+    return {
+      tokenAddress,
+      symbol,
+      name,
+      decimals,
+      balance
+    }
+  }
+
+  // Get wei allowance (read only query)
+  async getTokenAllowance(tokenAddress: string, contractAddress: string): Promise<string> {
+
+    // If it's the base token, then allowance is unlimited
+    if (tokenAddress == ADDRESS_ZERO) return MAX_VALUE;
+    const provider = this.provider$.getValue();
+    const selectedAccount = this.selectedAccount$.getValue();
+    const contract = new this.ethers.Contract(tokenAddress, ERC20_ABI, provider);
+    return (await contract.allowance(selectedAccount, contractAddress)).toString();
+  }
+
+  // Get wei balance (read only query)
+  async getTokenBalance(tokenAddress: string): Promise<string> {
+
+    const provider = this.provider$.getValue();
+    const selectedAccount = this.selectedAccount$.getValue();
+
+    // If it's the base token, then use getBalance...
+    if (provider && selectedAccount && tokenAddress == ADDRESS_ZERO)
+      return (await provider.getBalance(selectedAccount)).toString();
+
+    // ...otherwise instantiate an ERC20 contract and use balanceOf instead
+    const contract = new this.ethers.Contract(tokenAddress, ERC20_ABI, provider);
+    return (await contract.balanceOf(selectedAccount)).toString();
   }
 
   private async _connect(resolve: Function, reject: Function, providerName: string) {

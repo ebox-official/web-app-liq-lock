@@ -5,7 +5,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class FormatMultiplierPipe implements PipeTransform {
 
-  transform(value: any, res: number = 2): unknown {
+  transform(value: any, res = 2): unknown {
 
     if (value === null || value === undefined) return "-";
 

@@ -24,3 +24,7 @@ html.dark ::-webkit-scrollbar {
 html.dark ::-webkit-scrollbar-thumb {
   background-color: var(--bs-primary);
 }
+
+.lh-0 {
+  line-height: 1;
+}

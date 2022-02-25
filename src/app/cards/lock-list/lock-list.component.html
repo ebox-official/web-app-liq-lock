@@ -1,8 +1,8 @@
 <app-card-archetype>
     <ng-container class="card-header-content">
-        <h5>Lock list</h5>
+        <h5 class="mb-3">Lock list</h5>
         <p class="d-inline-flex gap-2">
-            <a href="#" class="btn btn-sm btn-primary"><i class="bi bi-lock-fill me-2"></i>Create lock</a>
+            <a [routerLink]="['/create-lock']" class="btn btn-sm btn-primary"><i class="bi bi-lock-fill me-2"></i>Create lock</a>
             <a href="#" class="btn btn-sm btn-primary"><i class="bi bi-pen me-2"></i>Edit lock</a>
             <a href="#" class="btn btn-sm btn-primary"><i class="bi bi-unlock-fill me-2"></i>Withdraw lock</a>
         </p>
@@ -21,4 +21,4 @@
     <ng-container class="card-footer-content">
         <app-connection-information></app-connection-information>
     </ng-container>
-  </app-card-archetype>
+</app-card-archetype>

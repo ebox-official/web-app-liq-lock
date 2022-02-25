@@ -1,0 +1,18 @@
+.token-list {
+    max-height: 250px;
+    overflow: auto;
+}
+
+.token-list-item {
+    cursor: pointer;
+}
+
+.token-list-item.selected::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: .333rem;
+    height: 100%;
+    background-color: var(--bs-primary);
+}
