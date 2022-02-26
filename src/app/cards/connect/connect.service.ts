@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, Subject, timer, zip } from 'rxjs';
-import { filter, tap, switchMap, map, catchError } from 'rxjs/operators';
+import { BehaviorSubject, Subject, timer, zip } from 'rxjs';
+import { filter, tap, switchMap, map } from 'rxjs/operators';
 import { ethers } from "ethers";
 import { ProvidersService } from './providers.service';
 import { ToastColor, ToasterService } from 'src/app/toaster/toaster.service';
@@ -16,7 +16,7 @@ export class Token {
     public symbol: string,
     public name: string,
     public decimals: string,
-    public balance: string
+    public balance?: string
   ) { }
 
 }
@@ -205,8 +205,8 @@ export class ConnectService {
     return this.ethers.utils.parseUnits(decimalString , decimals).toString();
   }
 
-  // Get symbol, name, # of decimals and wei balance (read only query)
-  async getTokenInfo(tokenAddress: string) {
+  // Get symbol, name, # of decimals and (if needed) wei balance (read only query)
+  async getTokenInfo(tokenAddress: string, withBalance = false) {
 
     const provider = this.provider$.getValue();
     const contract = new this.ethers.Contract(tokenAddress, ERC20_ABI, provider);
@@ -214,14 +214,16 @@ export class ConnectService {
     const [
       symbol,
       name,
-      decimals,
-      balance
+      decimals
     ] = await Promise.all([
       contract.symbol(),
       contract.name(),
-      contract.decimals(),
-      this.getTokenBalance(tokenAddress)
+      contract.decimals()
     ]);
+
+    let balance;
+    if (withBalance)
+      balance = await this.getTokenBalance(tokenAddress);
 
     return new Token(
       tokenAddress,

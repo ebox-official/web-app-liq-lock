@@ -1,4 +1,5 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
+import { LiquidityLockerService } from './services/liquidity-locker.service';
 
 @Component({
   selector: 'app-root',
@@ -10,7 +11,7 @@ export class AppComponent {
 
   @ViewChild("appBody") appBody: ElementRef;
 
-  constructor() { }
+  constructor(private ll: LiquidityLockerService) { }
 
   setBackground(isDarkmode: boolean) {
     this.appBody.nativeElement.style.backgroundImage = isDarkmode ?

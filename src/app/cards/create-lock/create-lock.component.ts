@@ -95,11 +95,12 @@ export class CreateLockComponent implements OnInit {
       token.address,
       NETWORK_MAP[chainId].contracts.liquidityLocker
     )
-    .then(allowance =>
+    .then(allowance => {
 
       // It would be better to check if the amount the user is trying to lock is greater than the allowance, but it's OK nonetheless as we are always asking for MAX_VALUE allowance
-      this.hasToApprove = new BigNumber(token.balance).isGreaterThan(allowance)
-    );
+      if (token.balance)
+        this.hasToApprove = new BigNumber(token.balance).isGreaterThan(allowance);
+    });
   }
 
   addAmountValidator() {
