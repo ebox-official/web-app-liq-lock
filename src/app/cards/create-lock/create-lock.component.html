@@ -31,7 +31,13 @@
                         <ng-template #tokensLoaded>
                             <small class="text-muted">(click to select)</small>
                             <ul class="token-list list-group list-group-flush border">
-                                <li class="token-list-item list-group-item position-relative d-flex flex-wrap gap-2" *ngFor="let t of userTokens$ | async; trackBy: trackTokenByAddress" (click)="selectToken(t)" [class.selected]="selectedToken && selectedToken.address === t.address">
+                                <li class="token-list-item list-group-item position-relative d-flex flex-wrap gap-2"
+                                    *ngFor="let t of userTokens$ | async;  let odd = odd; trackBy: trackTokenByAddress"
+                                    (click)="selectToken(t)"
+                                    [ngClass]="{
+                                        'selected-row': selectedToken && selectedToken.address === t.address,
+                                        'odd-row': odd
+                                    }">
                                     <div>
                                         <small class="text-muted">Symbol</small>
                                         <div>{{ t.symbol }}</div>

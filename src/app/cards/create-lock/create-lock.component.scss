@@ -7,7 +7,7 @@
     cursor: pointer;
 }
 
-.token-list-item.selected::after {
+.token-list-item.selected-row::after {
     content: "";
     position: absolute;
     top: 0;
@@ -15,4 +15,8 @@
     width: .333rem;
     height: 100%;
     background-color: var(--bs-primary);
+}
+
+.token-list-item.odd-row {
+    background-color: #8882;
 }
