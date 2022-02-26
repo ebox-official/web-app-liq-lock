@@ -1,13 +1,30 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Subject, zip } from 'rxjs';
-import { filter, tap, switchMap, takeUntil, map } from 'rxjs/operators';
+import { BehaviorSubject, Observable, Subject, timer, zip } from 'rxjs';
+import { filter, tap, switchMap, map, catchError } from 'rxjs/operators';
 import { ethers } from "ethers";
-import { BigNumber } from '@ethersproject/bignumber';
 import { ProvidersService } from './providers.service';
 import { ToastColor, ToasterService } from 'src/app/toaster/toaster.service';
 import { NETWORK_MAP } from 'src/app/data/providers';
 import { ADDRESS_ZERO, MAX_VALUE } from 'src/app/data/constants';
 import { ERC20_ABI } from 'src/app/data/abis';
+import { HttpClient } from '@angular/common/http';
+
+export class Token {
+
+  constructor(
+    public address: string,
+    public symbol: string,
+    public name: string,
+    public decimals: string,
+    public balance: string
+  ) { }
+
+}
+
+interface NetworkChangeNotification {
+  topic: string,
+  value: string | undefined | null
+}
 
 const LS_KEY = "EBOX_CACHED_PROVIDER";
 const SYNC_RATE = 1000;
@@ -18,25 +35,43 @@ const CACHE_PROVIDER = true;
 })
 export class ConnectService {
   
-  ethers = ethers;
+  ethers;
 
-  provider$ = new BehaviorSubject<ethers.providers.Web3Provider | undefined>(undefined);
-  signer$ = new BehaviorSubject<ethers.providers.JsonRpcSigner | undefined>(undefined);
+  provider$: BehaviorSubject<ethers.providers.Web3Provider | undefined>;
+  signer$: BehaviorSubject<ethers.providers.JsonRpcSigner | undefined>;
 
-  chainId$ = new BehaviorSubject<string | undefined | null>(undefined);
-  selectedAccount$ = new BehaviorSubject<string | undefined | null>(undefined);
-  baseTokenBalance$ = new BehaviorSubject<string | undefined | null>(undefined);
+  chainId$: BehaviorSubject<string | undefined | null>;
+  selectedAccount$: BehaviorSubject<string | undefined | null>;
+  baseTokenBalance$: BehaviorSubject<string | undefined | null>;
 
-  isConnected$ = new BehaviorSubject<boolean>(false);
-  networkChangeNotification$ = new Subject();
+  userTokens$: BehaviorSubject<Token[] | undefined | null>;
 
-  unsupportedNetworkFlag = false;
+  isConnected$: BehaviorSubject<boolean>;
+  networkChangeNotification$: Subject<NetworkChangeNotification>;
+
+  unsupportedNetworkFlag: boolean;
   updateVarsTimer: NodeJS.Timeout;
 
   constructor(
     private providers: ProvidersService,
-    private toasterService: ToasterService
+    private toasterService: ToasterService,
+    private http: HttpClient
   ) {
+    this.ethers = ethers;
+
+    this.provider$ = new BehaviorSubject<ethers.providers.Web3Provider | undefined>(undefined);
+    this.signer$ = new BehaviorSubject<ethers.providers.JsonRpcSigner | undefined>(undefined);
+
+    this.chainId$ = new BehaviorSubject<string | undefined | null>(undefined);
+    this.selectedAccount$ = new BehaviorSubject<string | undefined | null>(undefined);
+    this.baseTokenBalance$ = new BehaviorSubject<string | undefined | null>(undefined);
+
+    this.userTokens$ = new BehaviorSubject<Token[] | undefined | null>(undefined);
+
+    this.isConnected$ = new BehaviorSubject<boolean>(false);
+    this.networkChangeNotification$ = new Subject();
+
+    this.unsupportedNetworkFlag = false;
 
     // Tweak the state of connection based on provider, signer, chainId, selectedAccount and baseTokenBalance
     zip(
@@ -79,6 +114,48 @@ export class ConnectService {
     )
     .subscribe();
 
+    // If the user has connect, then start polling his/her tokens
+    this.isConnected$.pipe(
+      filter(isConnected => isConnected),
+      switchMap(_ => this.getUserTokens$())
+    )
+    .subscribe(
+      userTokens => this.userTokens$.next(userTokens),
+      _ => this.userTokens$.next(null)
+    );
+  }
+
+  getUserTokens$() {
+
+    const selectedAccount = this.selectedAccount$.getValue();
+    if (!selectedAccount)
+      throw new Error("Selected account is falsy, cannot get tokens.");
+    
+    const formData = new FormData();
+    formData.append("action", "get_tokens");
+    formData.append("address", selectedAccount);
+    formData.append("chain", "rinkeby");
+
+    return timer(450, 10 * SYNC_RATE)
+      .pipe(
+        switchMap(_ => 
+          this.http.post<any>(
+            "https://www.ebox.io/fkm8s7jfx32wf8pi/liq_lock/moralis.php",
+            formData
+          )
+        ),
+        map((tokens: any[]) => 
+          tokens.map((t: any) =>
+            new Token(
+              t.token_address,
+              t.symbol,
+              t.name,
+              t.decimals,
+              t.balance
+            )
+          )
+        )
+      );
   }
 
   private checkNetworkSupport() {
@@ -146,13 +223,13 @@ export class ConnectService {
       this.getTokenBalance(tokenAddress)
     ]);
 
-    return {
+    return new Token(
       tokenAddress,
       symbol,
       name,
       decimals,
       balance
-    }
+    );
   }
 
   // Get wei allowance (read only query)

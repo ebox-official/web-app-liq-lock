@@ -10,7 +10,7 @@ export class AppComponent {
 
   @ViewChild("appBody") appBody: ElementRef;
 
-  constructor() {}
+  constructor() { }
 
   setBackground(isDarkmode: boolean) {
     this.appBody.nativeElement.style.backgroundImage = isDarkmode ?

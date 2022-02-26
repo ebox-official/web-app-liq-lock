@@ -1,7 +1,9 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
+import { ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
+
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './header/header.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
@@ -38,7 +40,6 @@ import { WithdrawLockComponent } from './cards/withdraw-lock/withdraw-lock.compo
 import { PleaseConnectComponent } from './cards/please-connect/please-connect.component';
 import { WeiToDecimalPipe } from './pipes/wei-to-decimal.pipe';
 import { DecimalToWeiPipe } from './pipes/decimal-to-wei.pipe';
-import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -82,6 +83,7 @@ import { ReactiveFormsModule } from '@angular/forms';
   imports: [
     BrowserModule,
     ReactiveFormsModule,
+    HttpClientModule,
     AppRoutingModule
   ],
   providers: [],

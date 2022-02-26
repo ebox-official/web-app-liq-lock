@@ -22,7 +22,7 @@ const NETWORK_MAP: any = {
         name: "Rinkeby",
         thumb: "https://assets.coingecko.com/coins/images/279/thumb/ethereum.png",
         accountScannerUrl: (address: string) => `https://rinkeby.etherscan.io/address/${address}`,
-        supportedContracts: {
+        contracts: {
             liquidityLocker: "0x1916869fc1597754af933dA9A645622BFAF6cb15",
             tokenDispenser: "0x8dd4F3AFA4C2c41057f95DC56801b3D0cAfC3A3E"
         }
