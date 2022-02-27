@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Subject, timer, zip } from 'rxjs';
-import { filter, tap, switchMap, map } from 'rxjs/operators';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { ethers } from "ethers";
 import { ProvidersService } from './providers.service';
 import { ToastColor, ToasterService } from 'src/app/toaster/toaster.service';
@@ -23,7 +22,7 @@ export class Token {
 
 interface NetworkChangeNotification {
   topic: string,
-  value: string | undefined | null
+  value: string
 }
 
 const LS_KEY = "EBOX_CACHED_PROVIDER";
@@ -36,21 +35,20 @@ const CACHE_PROVIDER = true;
 export class ConnectService {
   
   ethers;
+  provider: ethers.providers.Web3Provider;
+  signer: ethers.providers.JsonRpcSigner;
 
-  provider$: BehaviorSubject<ethers.providers.Web3Provider | undefined>;
-  signer$: BehaviorSubject<ethers.providers.JsonRpcSigner | undefined>;
-
-  chainId$: BehaviorSubject<string | undefined | null>;
-  selectedAccount$: BehaviorSubject<string | undefined | null>;
-  baseTokenBalance$: BehaviorSubject<string | undefined | null>;
-
-  userTokens$: BehaviorSubject<Token[] | undefined | null>;
+  chainId$: BehaviorSubject<string>;
+  selectedAccount$: BehaviorSubject<string>;
+  baseTokenBalance$: BehaviorSubject<string>;
 
   isConnected$: BehaviorSubject<boolean>;
   networkChangeNotification$: Subject<NetworkChangeNotification>;
-
   unsupportedNetworkFlag: boolean;
-  updateVarsTimer: NodeJS.Timeout;
+  
+  loadingUserTokens$: BehaviorSubject<boolean>;
+  userTokensInitialized$: BehaviorSubject<boolean>;
+  userTokens$: BehaviorSubject<Token[]>;
 
   constructor(
     private providers: ProvidersService,
@@ -59,73 +57,125 @@ export class ConnectService {
   ) {
     this.ethers = ethers;
 
-    this.provider$ = new BehaviorSubject<ethers.providers.Web3Provider | undefined>(undefined);
-    this.signer$ = new BehaviorSubject<ethers.providers.JsonRpcSigner | undefined>(undefined);
-
-    this.chainId$ = new BehaviorSubject<string | undefined | null>(undefined);
-    this.selectedAccount$ = new BehaviorSubject<string | undefined | null>(undefined);
-    this.baseTokenBalance$ = new BehaviorSubject<string | undefined | null>(undefined);
-
-    this.userTokens$ = new BehaviorSubject<Token[] | undefined | null>(undefined);
+    this.loadingUserTokens$ = new BehaviorSubject<boolean>(false);
+    this.userTokensInitialized$ = new BehaviorSubject<boolean>(false);
+    this.userTokens$ = new BehaviorSubject<Token[]>([]);
 
     this.isConnected$ = new BehaviorSubject<boolean>(false);
     this.networkChangeNotification$ = new Subject();
-
     this.unsupportedNetworkFlag = false;
-
-    // Tweak the state of connection based on provider, signer, chainId, selectedAccount and baseTokenBalance
-    zip(
-      this.provider$,
-      this.signer$,
-      this.chainId$,
-      this.selectedAccount$,
-      this.baseTokenBalance$
-    ).subscribe(values => {
-
-      // When everything has emitted a non-falsy value, it means provider has connected
-      let isConnected = values.every(value => value !== null && value !== undefined);
-
-      // Emit a new state only when it changes
-      if (this.isConnected$.getValue() !== isConnected) {
-        this.isConnected$.next(isConnected);
-      }
-    });
-
-    // Emit a network change when either chainId or selectedAccount change
-    this.chainId$.subscribe(value =>
-      this.networkChangeNotification$.next({ topic: "chainId", value })
-    );
-    this.selectedAccount$.subscribe(value =>
-      this.networkChangeNotification$.next({ topic: "selectedAccount", value })
-    );
-
-    // Check network on connection
-    this.isConnected$.pipe(
-      filter(isConnected => isConnected),
-      tap(_ => this.checkNetworkSupport())
-    )
-    .subscribe();
-
-    // If chainId or selectedAccount changed after connection, then reload
-    this.isConnected$.pipe(
-      filter(isConnected => isConnected),
-      switchMap(_ => this.networkChangeNotification$),
-      tap(_ => window.location.reload())
-    )
-    .subscribe();
-
-    // If the user has connect, then start polling his/her tokens
-    this.isConnected$.pipe(
-      filter(isConnected => isConnected),
-      switchMap(_ => this.getUserTokens$())
-    )
-    .subscribe(
-      userTokens => this.userTokens$.next(userTokens),
-      _ => this.userTokens$.next(null)
-    );
   }
 
-  getUserTokens$() {
+  // Decide whether to connect via cached provider or not
+  connect(providerName?: string) {
+
+    // Return a promise so that it can be awaited by the consumer
+    return new Promise(async (resolve, reject) => {
+
+      if (providerName) {
+        this._connect(resolve, reject, providerName);
+        return;
+      }
+
+      // Load the cached provider straight away
+      let key = localStorage.getItem(LS_KEY);
+      if (CACHE_PROVIDER && key) {
+        this._connect(resolve, reject, key);
+      }
+    });
+  }
+
+  // Resolve connector and initialize connection variables
+  private async _connect(resolve: Function, reject: Function, providerName: string) {
+
+    // Get the provider selected by the user
+    let providerConnector = this.providers.PROVIDER_MAP[providerName];
+    if (!this.providers.PROVIDER_MAP[providerName]) {
+      reject("Provider name not found.");
+    }
+
+    let result;
+    try {
+
+      // Await the evaluation of the connector
+      result = await providerConnector.call(this.providers);
+    }
+    catch (err) {
+
+      // Clear the cache because it can be that the user dismissed the modal on resumed connection
+      this.clearCachedProvider();
+      reject(err);
+      return;
+    }
+
+    // Initialize provider and signer
+    this.provider = result.provider;
+    this.signer = result.signer;
+
+    // Initialize chainId
+    const { chainId: originalChainId } = await result.getNetwork();
+    this.chainId$ = new BehaviorSubject(originalChainId);
+
+    // Initialize selectedAccount
+    const accounts = await result.getAccounts();
+    const originalSelectedAccount = (Array.isArray(accounts)) ? accounts[0] : accounts;
+    this.selectedAccount$ = new BehaviorSubject(originalSelectedAccount);
+
+    // Initialize baseTokenBalance
+    const balance = await result.signer.getBalance();
+    this.baseTokenBalance$ = new BehaviorSubject(ethers.utils.formatEther(balance));
+
+    this.pollConnectionVariables(result.getNetwork, result.getAccounts, result.signer);
+
+    // Connection established
+    this.isConnected$.next(true);
+    this.checkNetworkSupport();
+
+    // If chainId or selectedAccount change, then reload
+    this.chainId$.subscribe(value => {
+      if (value !== originalChainId) window.location.reload();
+    });
+    this.selectedAccount$.subscribe(value => {
+      if (value !== originalSelectedAccount) window.location.reload();
+    });
+
+    this.pollUserTokens();
+
+    if (CACHE_PROVIDER)
+      localStorage.setItem(LS_KEY, providerName);
+    
+    resolve(true);
+  }
+
+  private async pollConnectionVariables(
+    getNetwork: Function,
+    getAccounts: Function,
+    signer: ethers.providers.JsonRpcSigner
+  ) {
+
+    // Update chainId
+    const { chainId } = await getNetwork();
+    this.chainId$.next(chainId);
+
+    // Update selectedAccount
+    const accounts = await getAccounts();
+    const selectedAccount = (Array.isArray(accounts)) ? accounts[0] : accounts;
+    this.selectedAccount$.next(selectedAccount);
+
+    // Update baseTokenBalance
+    const balance = await signer.getBalance();
+    this.baseTokenBalance$.next(ethers.utils.formatEther(balance));
+
+    setTimeout(() => this.pollConnectionVariables(getNetwork, getAccounts, signer), SYNC_RATE);
+  }
+
+  private checkNetworkSupport() {
+    if (!NETWORK_MAP[(this.chainId$.getValue() || -1)])
+      this.unsupportedNetworkFlag = true;
+  }
+
+  private async pollUserTokens() {
+    this.loadingUserTokens$.next(true);
 
     const selectedAccount = this.selectedAccount$.getValue();
     if (!selectedAccount)
@@ -136,31 +186,44 @@ export class ConnectService {
     formData.append("address", selectedAccount);
     formData.append("chain", "rinkeby");
 
-    return timer(450, 10 * SYNC_RATE)
-      .pipe(
-        switchMap(_ => 
-          this.http.post<any>(
-            "https://www.ebox.io/fkm8s7jfx32wf8pi/liq_lock/moralis.php",
-            formData
-          )
-        ),
-        map((tokens: any[]) => 
-          tokens.map((t: any) =>
-            new Token(
-              t.token_address,
-              t.symbol,
-              t.name,
-              t.decimals,
-              t.balance
-            )
-          )
+    const userTokens: any[] = await this.http.post<any>(
+      "https://www.ebox.io/fkm8s7jfx32wf8pi/liq_lock/moralis.php",
+      formData
+    )
+    .toPromise();
+
+    this.userTokens$.next(
+      userTokens.map(t =>
+        new Token(
+          t.token_address,
+          t.symbol,
+          t.name,
+          t.decimals,
+          t.balance
         )
-      );
+      )
+    );
+
+    this.loadingUserTokens$.next(false);
+    this.userTokensInitialized$.next(true);
+
+    setTimeout(() => this.pollUserTokens(), 10 * SYNC_RATE);
   }
 
-  private checkNetworkSupport() {
-    if (!NETWORK_MAP[(this.chainId$.getValue() || -1)])
-      this.unsupportedNetworkFlag = true;
+  clearCachedProvider() {
+    localStorage.removeItem(LS_KEY);
+
+    // Manually removing leftovers from wallet providers
+    Object.keys(localStorage).forEach(key => {
+      if (/(walletlink|walletconnect)/i.test(key)) {
+        localStorage.removeItem(key);
+      }
+    });
+  }
+
+  disconnect() {
+    this.clearCachedProvider();
+    window.location.reload();
   }
 
   checksumAddress(address: string): string {
@@ -174,7 +237,7 @@ export class ConnectService {
 
   async signMessage(message: string) {
 
-    let signer = await this.signer$.getValue();
+    let signer = await this.signer;
     if (!signer) {
       this.toasterService.publish(ToastColor.danger, "Message could not be signed, no signer object found.");
       throw new Error();
@@ -208,7 +271,7 @@ export class ConnectService {
   // Get symbol, name, # of decimals and (if needed) wei balance (read only query)
   async getTokenInfo(tokenAddress: string, withBalance = false) {
 
-    const provider = this.provider$.getValue();
+    const provider = this.provider;
     const contract = new this.ethers.Contract(tokenAddress, ERC20_ABI, provider);
 
     const [
@@ -239,7 +302,7 @@ export class ConnectService {
 
     // If it's the base token, then allowance is unlimited
     if (tokenAddress == ADDRESS_ZERO) return MAX_VALUE;
-    const provider = this.provider$.getValue();
+    const provider = this.provider;
     const selectedAccount = this.selectedAccount$.getValue();
     const contract = new this.ethers.Contract(tokenAddress, ERC20_ABI, provider);
     return (await contract.allowance(selectedAccount, contractAddress)).toString();
@@ -248,7 +311,7 @@ export class ConnectService {
   // Get wei balance (read only query)
   async getTokenBalance(tokenAddress: string): Promise<string> {
 
-    const provider = this.provider$.getValue();
+    const provider = this.provider;
     const selectedAccount = this.selectedAccount$.getValue();
 
     // If it's the base token, then use getBalance...
@@ -258,170 +321,6 @@ export class ConnectService {
     // ...otherwise instantiate an ERC20 contract and use balanceOf instead
     const contract = new this.ethers.Contract(tokenAddress, ERC20_ABI, provider);
     return (await contract.balanceOf(selectedAccount)).toString();
-  }
-
-  private async _connect(resolve: Function, reject: Function, providerName: string) {
-
-    // Get the provider selected by the user
-    let providerConnector = this.providers.PROVIDER_MAP[providerName];
-    if (!this.providers.PROVIDER_MAP[providerName]) {
-      reject("Provider name not found.");
-    }
-
-    let result;
-    try {
-
-      // Await the evaluation of the connector
-      result = await providerConnector.call(this.providers);
-    }
-    catch (err) {
-
-      // Clear the cache because it can be that the user dismissed the modal on resumed connection
-      this.clearCachedProvider();
-      reject(err);
-      return;
-    }
-
-    this.provider$.next(result.provider);
-    this.signer$.next(result.signer);
-
-    // Sync variables
-    await this.syncingIntervals(result.getNetwork, result.getAccounts);
-
-    // When the connection is established, cache the provider and resolve
-    this.isConnected$.
-      subscribe(isConnected => {
-
-        if (isConnected) {
-          
-          // Cache the current provider
-          if (CACHE_PROVIDER) {
-            localStorage.setItem(LS_KEY, providerName);
-          }
-  
-          resolve(true);
-        }
-      });
-  }
-
-  connect(providerName?: string) {
-
-    // Return a promise so that it can be awaited by the consumer
-    return new Promise(async (resolve, reject) => {
-
-      if (providerName) {
-        this._connect(resolve, reject, providerName);
-        return;
-      }
-
-      // Load the cached provider straight away
-      let key = localStorage.getItem(LS_KEY);
-      if (CACHE_PROVIDER && key) {
-        this._connect(resolve, reject, key);
-      }
-    });
-  }
-
-  clearCachedProvider() {
-    localStorage.removeItem(LS_KEY);
-
-    // Manually removing leftovers from wallet providers
-    Object.keys(localStorage).forEach(key => {
-      if (/(walletlink|walletconnect)/i.test(key)) {
-        localStorage.removeItem(key);
-      }
-    });
-  }
-
-  disconnect() {
-    this.clearCachedProvider();
-    window.location.reload();
-  }
-
-  syncingIntervals(getNetwork: Function, getAccounts: Function) {
-
-    let updateVars = async () => {
-
-      // Chain id
-      let chainId;
-      try {
-        let network = await getNetwork();
-        chainId = network.chainId;
-      }
-      catch (err) {
-        console.error("Chain id doesn't seem available...", err);
-
-        // If it was impossible to get, then emit it as null and return
-        if (this.chainId$.getValue() !== null) {
-          this.chainId$.next(null);
-        }
-        return;
-      }
-      if (this.chainId$.getValue() !== chainId) {
-        this.chainId$.next(chainId);
-      }
-
-      // Selected account
-      let selectedAccount;
-      let response;
-      try {
-        response = await getAccounts();
-      }
-      catch (err: any) {
-        console.error("Selected account doesn't seem available...", err);
-
-        // If user denied the request (e.g. Fortmatic), then disconnect
-        if (err.code == "-32603") {
-          this.disconnect();
-          throw err;
-        }
-
-        // If it was impossible to get, then emit it as null and return
-        if (this.selectedAccount$.getValue() !== null) {
-          this.selectedAccount$.next(null);
-        }
-        return;
-      }
-      if (Array.isArray(response)) {
-        selectedAccount = response[0];
-      }
-      else {
-        selectedAccount = response;
-      }
-      if (this.selectedAccount$.getValue() !== selectedAccount) {
-        this.selectedAccount$.next(selectedAccount);
-      }
-
-      // Base token balance
-      let signer = this.signer$.getValue();
-      if (signer !== null && signer !== undefined) {
-        let balance;
-        try {
-          balance = await signer.getBalance();
-        }
-        catch (err) {
-          console.error("Base token amount doesn't seem available...", err);
-
-          // If it was impossible to get, then emit it as null and return
-          if (this.baseTokenBalance$.getValue() !== null) {
-            this.baseTokenBalance$.next(null);
-          }
-          return;
-        }
-        let ether = ethers.utils.formatEther(balance);
-        if (this.baseTokenBalance$.getValue() !== ether) {
-          this.baseTokenBalance$.next(ether);
-        }
-      }
-    };
-
-    let loop = async () => {
-      await updateVars();
-      this.updateVarsTimer = setTimeout(() => loop(), SYNC_RATE);
-    }
-
-    // Call the above immediately
-    if (!this.updateVarsTimer) loop();
   }
   
 }

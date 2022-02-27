@@ -1,0 +1,36 @@
+<div class="lock" (click)="navigateToDetails()">
+
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-2">
+        <div>
+            <div>
+                <div><small class="text-muted">Expiration date</small></div>
+                <span>{{ lock.expirationTime | formatDate }}
+                    <i class="bi ms-2"
+                        [ngClass]="{
+                            'bi-lock-fill': lock.isLocked(),
+                            'text-primary': lock.isLocked(),
+                            'bi-unlock': !lock.isLocked()
+                        }"></i>
+                </span>
+            </div>
+        </div>
+        <div class="text-md-end">
+            <div><small class="text-muted">Owner</small></div>
+            <small>{{ lock.getOwner() }}</small>
+        </div>
+    </div>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-2">
+        <div>
+            <div>
+                <small class="text-muted me-2">Token</small>
+                <span>{{ lock.token.symbol }}</span>
+            </div>
+            <small>{{ lock.token.address }}</small>
+        </div>
+        <div class="text-md-end">
+            <div><small class="text-muted">Value</small></div>
+            <div class="fs-4 lh-0">{{ lock.value | weiToDecimal: lock.token.decimals | formatMultiplier }}</div>
+        </div>
+    </div>
+</div>

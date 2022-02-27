@@ -1,24 +1,46 @@
 import { Injectable } from '@angular/core';
 import { ConnectService, Token } from '../cards/connect/connect.service';
 import { NETWORK_MAP } from 'src/app/data/providers';
-import { filter } from 'rxjs/operators';
 import { LIQUIDITY_LOCKER_ABI, TOKEN_DISPENSER_ABI } from '../data/abis';
 import { Contract } from 'ethers';
+import { BehaviorSubject } from 'rxjs';
 
-class Lock {
+class LockCreateEventObject {
 
   constructor(
-    public index: string,
+    public index: number,
     public originalOwner: string,
-    public transfers?: any[], // 0: oldest, N: newest
-    public expirationTime?: string,
-    public token?: Token,
-    public value?: string
+    public transfers: any[] | undefined
   ) { }
 
 }
 
+export class Lock {
+
+  constructor(
+    public index: number,
+    public originalOwner: string,
+    public transfers: any[] | undefined, // 0: oldest, N: newest
+    public expirationTime: number,
+    public token: Token,
+    public value: string
+  ) { }
+
+  getOwner() {
+    if (this.transfers)
+      return [...this.transfers].pop().newOwner;
+    else
+      return this.originalOwner;
+  }
+
+  isLocked() {
+    return this.expirationTime > Date.now();
+  }
+
+}
+
 const BATCH_SIZE = 4;
+const SYNC_RATE = 10000;
 
 @Injectable({
   providedIn: 'root'
@@ -30,27 +52,33 @@ export class LiquidityLockerService {
   tokenDispenserContractAddress: string;
   tokenDispenserContract: Contract;
 
+  loadingLocks$: BehaviorSubject<boolean>;
+  locksInitialized$: BehaviorSubject<boolean>;
+  locks: Lock[];
+  locks$: BehaviorSubject<Lock[]>;
+  latestLocksTimestamp: number;
+
   fee: number;
 
   constructor(
     private connectService: ConnectService
   ) {
+    this.loadingLocks$ = new BehaviorSubject<boolean>(false);
+    this.locksInitialized$ = new BehaviorSubject<boolean>(false);
+    this.locks = [];
+    this.locks$ = new BehaviorSubject<Lock[]>(this.locks);
 
     this.connectService.isConnected$
-      .pipe(
-        filter(isConnected => isConnected)
-      )
       .subscribe(_ => {
 
-        const chainId: any = this.connectService.chainId$.getValue();
-        const signer = this.connectService.signer$.getValue();
+        const chainId = this.connectService.chainId$.getValue();
 
         this.liquidityLockerContractAddress = NETWORK_MAP[chainId].contracts.liquidityLocker;
         console.log("Liquidity lock addr", this.liquidityLockerContractAddress);
         this.liquidityLockerContract = new this.connectService.ethers.Contract(
           this.liquidityLockerContractAddress,
           LIQUIDITY_LOCKER_ABI,
-          signer
+          this.connectService.signer
         );
 
         // If the network supports a token dispenser, then load it
@@ -60,7 +88,7 @@ export class LiquidityLockerService {
           this.tokenDispenserContract = new this.connectService.ethers.Contract(
             this.tokenDispenserContractAddress,
             TOKEN_DISPENSER_ABI,
-            signer
+            this.connectService.signer
           );
         }
 
@@ -72,11 +100,14 @@ export class LiquidityLockerService {
           });
 
         this.loadLocks();
-
       });
   }
 
   loadLocks() {
+    const currentLoadLocksTimestamp = Date.now();
+    
+    this.loadingLocks$.next(true);
+    this.locks = [];
 
     const LockCreateFilter = this.liquidityLockerContract.filters.LockCreate();
     const LockTransferFilter = this.liquidityLockerContract.filters.LockTransfer();
@@ -104,8 +135,8 @@ export class LiquidityLockerService {
           });
         }),
         creates.map((c: any) =>
-          new Lock(
-            c.args.index.toString(),
+          new LockCreateEventObject(
+            Number(c.args.index.toString()),
             c.args.owner,
             transfersMap[c.args.index]
           )
@@ -114,19 +145,19 @@ export class LiquidityLockerService {
     )
     .then(async (creates) => {
 
-      creates.sort((a: Lock, b: Lock) => parseInt(b.index) - parseInt(a.index));
+      creates.sort((a: LockCreateEventObject, b: LockCreateEventObject) => b.index - a.index);
 
-      // Send groups of requests of BATCH_SIZE, then bundle them back
+      // Send groups of requests of BATCH_SIZE
       for (let i = 0; i < creates.length; i += BATCH_SIZE) {
 
         // Make a batch of promises to get the details of each lock
         const batchOfPromiseOfLock = creates
           .slice(i, i + BATCH_SIZE)
-          .map((info: Lock) =>
+          .map((createEventObject: LockCreateEventObject) =>
             new Promise(async (resolve) =>
               resolve({
-                info,
-                details: await this.liquidityLockerContract.getLock(info.index)
+                createEventObject,
+                getLockResult: await this.liquidityLockerContract.getLock(createEventObject.index)
               })
             )
           );
@@ -139,19 +170,35 @@ export class LiquidityLockerService {
         for (const lock of batchOfLock) {
           locks.push(
             new Lock(
-              lock.info.index,
-              lock.info.originalOwner,
-              lock.info.transfers,
-              lock.details.expirationTime.toString(),
-              await this.connectService.getTokenInfo(lock.details.token),
-              lock.details.value.toString()
+              lock.createEventObject.index,
+              lock.createEventObject.originalOwner,
+              lock.createEventObject.transfers,
+              parseInt(lock.getLockResult.expirationTime.toString()) * 1000, // Asjust timestamp to JS standard
+              await this.connectService.getTokenInfo(lock.getLockResult.token),
+              lock.getLockResult.value.toString()
             )
           );
         }
 
-        console.log(locks);
+        this.locks.push(...locks);
+
+        // If it's the first time loading locks, then emit batch by batch
+        if (!this.locksInitialized$.getValue()) {
+          this.locks$.next(this.locks);
+          this.locksInitialized$.next(true);
+        }
       }
 
+      // If it's NOT the first time loading locks, then emit the whole set
+      if (this.locksInitialized$.getValue())
+        this.locks$.next(this.locks);
+
+        this.loadingLocks$.next(false);
+
+      // Schedule the next call to loadLocks only if it's the latest call
+      // This prevents parallel fetch cycles when forcing loadLocks
+      if (this.latestLocksTimestamp === currentLoadLocksTimestamp)
+        setTimeout(() => this.loadLocks(), SYNC_RATE)
     });
 
   }

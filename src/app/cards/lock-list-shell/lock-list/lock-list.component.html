@@ -1,0 +1,15 @@
+<ng-container *ngIf="!(locksInitialized$ | async); else locksLoaded">
+    <div class="text-center my-4">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+</ng-container>
+<ng-template #locksLoaded>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item" *ngFor="let l of locks$ | async; trackBy: trackLockByIndex">
+            <app-lock-list-item [lock]="l"></app-lock-list-item>
+        </li>
+    </ul>
+</ng-template>
+

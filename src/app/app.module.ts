@@ -28,18 +28,18 @@ import { BsPopDirective } from './directives/bs-pop.directive';
 import { BsTipDirective } from './directives/bs-tip.directive';
 import { NotFoundComponent } from './cards/not-found/not-found.component';
 import { CopyrightComponent } from './copyright/copyright.component';
-import { LockListComponent } from './cards/lock-list/lock-list.component';
-import { LockListPersonalComponent } from './cards/lock-list-personal/lock-list-personal.component';
-import { LockListGeneralComponent } from './cards/lock-list-general/lock-list-general.component';
+import { LockListShellComponent } from './cards/lock-list-shell/lock-list-shell.component';
+import { LockListComponent } from './cards/lock-list-shell/lock-list/lock-list.component';
 import { ConnectionInformationComponent } from './connection-information/connection-information.component';
-import { LockListItemComponent } from './cards/lock-list/lock-list-item/lock-list-item.component';
-import { LockComponent } from './cards/lock-list/lock/lock.component';
+import { LockListItemComponent } from './cards/lock-list-shell/lock-list-item/lock-list-item.component';
+import { LockComponent } from './cards/lock-list-shell/lock/lock.component';
 import { CreateLockComponent } from './cards/create-lock/create-lock.component';
 import { EditLockComponent } from './cards/edit-lock/edit-lock.component';
 import { WithdrawLockComponent } from './cards/withdraw-lock/withdraw-lock.component';
 import { PleaseConnectComponent } from './cards/please-connect/please-connect.component';
 import { WeiToDecimalPipe } from './pipes/wei-to-decimal.pipe';
 import { DecimalToWeiPipe } from './pipes/decimal-to-wei.pipe';
+import { ScannerLinkComponent } from './scanner-link/scanner-link.component';
 
 @NgModule({
   declarations: [
@@ -67,9 +67,8 @@ import { DecimalToWeiPipe } from './pipes/decimal-to-wei.pipe';
     BsTipDirective,
     NotFoundComponent,
     CopyrightComponent,
+    LockListShellComponent,
     LockListComponent,
-    LockListPersonalComponent,
-    LockListGeneralComponent,
     ConnectionInformationComponent,
     LockListItemComponent,
     LockComponent,
@@ -78,7 +77,8 @@ import { DecimalToWeiPipe } from './pipes/decimal-to-wei.pipe';
     WithdrawLockComponent,
     PleaseConnectComponent,
     WeiToDecimalPipe,
-    DecimalToWeiPipe
+    DecimalToWeiPipe,
+    ScannerLinkComponent
   ],
   imports: [
     BrowserModule,

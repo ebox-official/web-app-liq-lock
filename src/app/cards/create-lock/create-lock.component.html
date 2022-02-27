@@ -21,7 +21,7 @@
                 <div class="tab-content mb-3" id="pills-tabContent">
                     <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
                         
-                        <ng-container *ngIf="(userTokens$ | async) === undefined; else tokensLoaded">
+                        <ng-container *ngIf="!(userTokensInitialized$ | async); else tokensLoaded">
                             <div class="text-center">
                                 <div class="spinner-border" role="status">
                                     <span class="visually-hidden">Loading...</span>
@@ -29,9 +29,9 @@
                             </div>
                         </ng-container>
                         <ng-template #tokensLoaded>
-                            <small class="text-muted">(click to select)</small>
+                            <small class="text-muted">(Click to select)</small>
                             <ul class="token-list list-group list-group-flush border">
-                                <li class="token-list-item list-group-item position-relative d-flex flex-wrap gap-2"
+                                <li class="token-list-item list-group-item position-relative d-flex flex-wrap justify-content-md-between gap-2"
                                     *ngFor="let t of userTokens$ | async;  let odd = odd; trackBy: trackTokenByAddress"
                                     (click)="selectToken(t)"
                                     [ngClass]="{
@@ -46,7 +46,7 @@
                                         <small class="text-muted">Address</small>
                                         <div>{{ t.address }}</div>
                                     </div>
-                                    <div>
+                                    <div class="text-md-end">
                                         <small class="text-muted">Balance</small>
                                         <div>{{ t.balance | weiToDecimal: t.decimals | formatMultiplier }}</div>
                                     </div>
@@ -80,13 +80,13 @@
                 </div>
 
                 <ng-container *ngIf="!selectedToken; else showTokenInfo">
-                    <small class="text-muted">Please selected/load a token to proceed.</small>
+                    <small class="text-muted">Please load a token to proceed.</small>
                 </ng-container>
 
                 <ng-template #showTokenInfo>
-                    <div class="p-3 border border-primary rounded">
+                    <div class="p-3 border rounded">
                         <h5>Selected token</h5>
-                        <div class="d-flex flex-wrap gap-2">
+                        <div class="d-flex flex-wrap justify-content-md-between gap-2 px-2">
                             <div>
                                 <small class="text-muted">Symbol</small>
                                 <div>{{ selectedToken.symbol }}</div>
@@ -95,7 +95,7 @@
                                 <small class="text-muted">Address</small>
                                 <div>{{ selectedToken.address }}</div>
                             </div>
-                            <div>
+                            <div class="text-md-end">
                                 <small class="text-muted">Balance</small>
                                 <div>{{ selectedToken.balance | weiToDecimal: selectedToken.decimals | formatMultiplier }}</div>
                             </div>
@@ -135,12 +135,12 @@
                     <p *ngIf="amountField.errors.amountTooLow">Amount is too low</p>
                     <p *ngIf="amountField.errors.amountTooHigh">Amount is too high</p>
                 </div>
-                <div id="step-2-end"></div>
+                <div class="scroll-step" id="step-2-end"></div>
             </div>
 
             <!-- Step 3 -->
             <div *ngIf="selectedToken && amountConfirmed" class="pb-4">
-                <h4 class="mb-3">Step 3: Select/insert unlock date</h4>
+                <h4 class="mb-3">Step 3: Select unlock date</h4>
                 <div class="input-group mb-2">
                     <input [formControl]="unlockDateField"
                         [ngClass]="{
@@ -164,7 +164,7 @@
                     <p *ngIf="unlockDateField.errors.tooFarBack">Unlock date can't be in the past</p>
                     <p *ngIf="unlockDateField.errors.tooFarAhead">Unlock date can't be after {{ maxDate }}</p>
                 </div>
-                <div id="step-3-end"></div>
+                <div class="scroll-step" id="step-3-end"></div>
             </div>
 
             <!-- Step 4 -->
@@ -173,11 +173,11 @@
                 <div class="alert alert-danger" role="alert">
                     Be extremely sure that amount and unlock date are correct.<br>Nobody, not even ebox, will be able to revert the unlock until the unlock date!
                 </div>
-                <div class="p-3 border border-primary rounded mb-3">
+                <div class="p-3 border rounded mb-3">
                     <div class="d-grid gap-3">
                         <div>
                             <h5>Selected token</h5>
-                            <div class="d-flex flex-wrap gap-2">
+                            <div class="d-flex flex-wrap justify-content-md-between gap-2 px-2">
                                 <div>
                                     <small class="text-muted">Symbol</small>
                                     <div>{{ selectedToken.symbol }}</div>
@@ -186,7 +186,7 @@
                                     <small class="text-muted">Address</small>
                                     <div>{{ selectedToken.address }}</div>
                                 </div>
-                                <div>
+                                <div class="text-md-end">
                                     <small class="text-muted">Balance</small>
                                     <div>{{ selectedToken.balance | weiToDecimal: selectedToken.decimals | formatMultiplier }}</div>
                                 </div>
@@ -221,7 +221,7 @@
                     <button *ngIf="hasToApprove" class="btn btn-lg btn-outline-primary">Approve</button>
                     <button class="btn btn-lg btn-primary"
                         [class.disabled]="amountField.invalid || unlockDateField.invalid || hasToApprove">Lock</button>
-                    <div id="step-4-end"></div>
+                    <div class="scroll-step" id="step-4-end"></div>
                 </div>
             </div>
 

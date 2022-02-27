@@ -1,0 +1,83 @@
+<app-card-archetype>
+    <ng-container class="card-header-content">
+        <h5 class="mb-3">Lock details</h5>
+        <a class="text-decoration-none" [routerLink]="['/lock-list']"><i class="bi bi-arrow-left me-2"></i>Back to Lock list</a>
+    </ng-container>
+    <ng-container class="card-body-content">
+
+        <ng-container *ngIf="!(lock$ | async); else lockLoaded">
+            <div class="text-center my-4">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </ng-container>
+        <ng-template #lockLoaded>
+            <div *ngIf="lock$ | async as l" class="p-3">
+                <div class="d-grid gap-2">
+                    <div class="text-center" [class.text-primary]="l.isLocked()">
+                        <div>
+                            <i class="status-icon bi"
+                                [ngClass]="{
+                                    'bi-lock-fill': l.isLocked(),
+                                    'bi-unlock': !l.isLocked()
+                                }"></i>
+                        </div>
+                        <span class="status-text">{{ !l.isLocked() ? 'Unlocked' : 'Locked' }}</span>
+                    </div>
+                    <div>
+                        <div><small class="text-muted">Index</small></div>
+                        <span>{{ l.index }}</span>
+                    </div>
+                    <div>
+                        <div><small class="text-muted">Expiration date</small></div>
+                        <span>{{ l.expirationTime | formatDate }}
+                            <i class="bi ms-2"
+                                [ngClass]="{
+                                    'bi-lock-fill': l.isLocked(),
+                                    'text-primary': l.isLocked(),
+                                    'bi-unlock': !l.isLocked()
+                                }"></i>
+                        </span>
+                    </div>
+                    <div>
+                        <div><small class="text-muted">Current owner</small></div>
+                        <app-scanner-link [address]="l.getOwner()"></app-scanner-link>
+                    </div>
+                    <div *ngIf="l.transfers">
+                        <div><small class="text-muted">Transfers of ownership</small></div>
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex flex-wrap justify-content-between" *ngFor="let t of l.transfers">
+                                <div>
+                                    <small class="text-muted">Old owner</small>
+                                    <div>
+                                        <app-scanner-link [address]="t.oldOwner"></app-scanner-link>
+                                    </div>
+                                </div>
+                                <div>
+                                    <small class="text-muted">New owner</small>
+                                    <div>
+                                        <app-scanner-link [address]="t.newOwner"></app-scanner-link>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div><small class="text-muted">Token</small></div>
+                        <div><span>{{ l.token.symbol }}</span></div>
+                        <app-scanner-link [address]="l.token.address"></app-scanner-link>
+                    </div>
+                    <div>
+                        <div><small class="text-muted">Value</small></div>
+                        <div class="fs-4 lh-0">{{ l.value | weiToDecimal: l.token.decimals | formatMultiplier }}</div>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+
+    </ng-container>
+    <ng-container class="card-footer-content">
+        <app-connection-information></app-connection-information>
+    </ng-container>
+</app-card-archetype>

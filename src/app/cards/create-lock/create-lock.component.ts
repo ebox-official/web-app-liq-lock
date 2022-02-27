@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import BigNumber from 'bignumber.js';
 import { BehaviorSubject } from 'rxjs';
-import { MAX_VALUE } from 'src/app/data/constants';
 import { NETWORK_MAP } from 'src/app/data/providers';
 import { ValidatorsService } from 'src/app/services/validators.service';
 import { ConnectService, Token } from '../connect/connect.service';
@@ -14,9 +13,8 @@ import { ConnectService, Token } from '../connect/connect.service';
 })
 export class CreateLockComponent implements OnInit {
 
-  MAX_VALUE = MAX_VALUE;
-
-  userTokens$: BehaviorSubject<Token[] | undefined | null>;
+  userTokensInitialized$: BehaviorSubject<boolean>;
+  userTokens$: BehaviorSubject<Token[]>;
   selectedToken: any;
   hasToApprove: boolean;
   tokenAddrField: FormControl;
@@ -35,6 +33,7 @@ export class CreateLockComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.userTokensInitialized$ = this.connectService.userTokensInitialized$;
     this.userTokens$ = this.connectService.userTokens$;
     this.tokenAddrField = new FormControl("", [this.validatorsService.addressValidator()]);
 
@@ -78,7 +77,7 @@ export class CreateLockComponent implements OnInit {
 
   loadToken() {
     this.hasToApprove = false;
-    this.connectService.getTokenInfo(this.tokenAddrField.value)
+    this.connectService.getTokenInfo(this.tokenAddrField.value, true)
       .then(token => {
         this.selectedToken = token;
         this.amountField.reset();
@@ -133,9 +132,9 @@ export class CreateLockComponent implements OnInit {
     return new Date(date).getTime();
   }
 
-  scrollTo(elId: string) {
+  scrollTo(id: string) {
     setTimeout(() =>
-      (document.querySelector("#" + elId) as any)
+      (document.querySelector("#" + id) as any)
         .scrollIntoView({ behavior: "smooth", block: "end" })
     , 450);
   }

@@ -1,11 +1,9 @@
 <app-card-archetype>
     <ng-container class="card-header-content">
-        <h5 class="mb-3">Lock list</h5>
-        <p class="d-inline-flex gap-2">
-            <a [routerLink]="['/create-lock']" class="btn btn-sm btn-primary"><i class="bi bi-lock-fill me-2"></i>Create lock</a>
-            <a href="#" class="btn btn-sm btn-primary"><i class="bi bi-pen me-2"></i>Edit lock</a>
-            <a href="#" class="btn btn-sm btn-primary"><i class="bi bi-unlock-fill me-2"></i>Withdraw lock</a>
-        </p>
+        <div class="mb-3">
+            <h5 class="mb-2">Lock list</h5>
+            <small class="text-muted">Rendering the full list may take a while, as the list is fetched directly from the blockchain.<br>Loading status is: <span class="text-primary">{{ (loadingLocks$ | async) ? 'Fetching locks...' : 'Completed.' }}</span></small>
+        </div>
         <ul class="nav nav-tabs" style="margin-bottom: calc(-0.5rem - 1px)">
             <li class="nav-item">
                 <a class="nav-link" [routerLinkActive]="'active'" [routerLink]="['./general']">Everybody</a>
