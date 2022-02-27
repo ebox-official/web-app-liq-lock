@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { LiquidityLockerService, Lock } from 'src/app/services/liquidity-locker.service';
 
 @Component({
@@ -12,6 +12,7 @@ export class LockListItemComponent implements OnInit {
   @Input("lock") lock: Lock;
 
   constructor(
+    private route: ActivatedRoute,
     private router: Router
   ) {
   }
@@ -20,7 +21,7 @@ export class LockListItemComponent implements OnInit {
   }
 
   navigateToDetails() {
-    this.router.navigate(["/lock", this.lock.index]);
+    this.router.navigate([this.lock.index], { relativeTo: this.route });
   }
 
 }

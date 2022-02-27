@@ -24,7 +24,8 @@ const routes: Routes = [
       { path: "personal", component: LockListComponent, data: { viewMode: "personal" } }
     ]
   },
-  { path: "lock/:index", component: LockComponent, canActivate: [ConnectGuard] },
+  { path: "lock-list/general/:index", component: LockComponent, canActivate: [ConnectGuard] },
+  { path: "lock-list/personal/:index", component: LockComponent, canActivate: [ConnectGuard] },
   { path: "create-lock", component: CreateLockComponent, canActivate: [ConnectGuard] },
   { path: "**", component: NotFoundComponent }
 ];
