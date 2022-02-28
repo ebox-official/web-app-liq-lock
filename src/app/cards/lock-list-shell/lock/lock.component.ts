@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { LiquidityLockerService, Lock } from 'src/app/services/liquidity-locker.service';
 
@@ -11,24 +11,20 @@ import { LiquidityLockerService, Lock } from 'src/app/services/liquidity-locker.
 })
 export class LockComponent implements OnInit {
 
-  loadingLocks$: BehaviorSubject<boolean>;
-  lock$: Observable<any>;
+  lockIndex: number;
+  lock: Lock;
 
   constructor(
     private route: ActivatedRoute,
     private liquidityLockerService: LiquidityLockerService
   ) {
-    const lockIndex = this.route.snapshot.paramMap.get("index");
-    this.loadingLocks$ = this.liquidityLockerService.loadingLocks$;
-    this.lock$ = this.liquidityLockerService.locks$
-      .pipe(
-        map((locks: Lock[]) =>
-          locks.find((lock: Lock) => lock.index === Number(lockIndex))
-        )
-      );
+    const lockIndexParam = this.route.snapshot.paramMap.get("index");
+    if (!lockIndexParam) throw new Error("Could not get lock index.");
+    this.lockIndex = parseInt(lockIndexParam);
   }
 
-  ngOnInit(): void {
+  async ngOnInit() {
+    this.lock = await this.liquidityLockerService.getLock(this.lockIndex);
   }
 
 }

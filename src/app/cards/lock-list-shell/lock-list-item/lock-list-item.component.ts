@@ -1,6 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { LiquidityLockerService, Lock } from 'src/app/services/liquidity-locker.service';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Lock } from 'src/app/services/liquidity-locker.service';
 
 @Component({
   selector: 'app-lock-list-item',
@@ -10,18 +9,15 @@ import { LiquidityLockerService, Lock } from 'src/app/services/liquidity-locker.
 export class LockListItemComponent implements OnInit {
 
   @Input("lock") lock: Lock;
+  @Output("viewInitialized") viewInitialized = new EventEmitter<boolean>();
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router
-  ) {
-  }
+  constructor() { }
 
   ngOnInit(): void {
   }
 
-  navigateToDetails() {
-    this.router.navigate([this.lock.index], { relativeTo: this.route });
+  ngAfterViewInit() {
+    this.viewInitialized.emit(true);
   }
 
 }

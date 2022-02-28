@@ -103,12 +103,93 @@ export class LiquidityLockerService {
       });
   }
 
-  loadLocks() {
+  async loadLocks() {
     const currentLoadLocksTimestamp = Date.now();
     
     this.loadingLocks$.next(true);
     this.locks = [];
 
+    const createEventObjects = await this.getCreateEventObjectsWithTransfers();;
+
+    createEventObjects.reverse();
+
+    // Send groups of requests of BATCH_SIZE
+    for (let i = 0; i < createEventObjects.length; i += BATCH_SIZE) {
+
+      // Make a batch of promises to get the details of each lock
+      const batchOfPromiseOfResults = createEventObjects
+        .slice(i, i + BATCH_SIZE)
+        .map((createEventObject: LockCreateEventObject) =>
+          new Promise(async (resolve) =>
+            resolve({
+              createEventObject,
+              lock: await this.liquidityLockerContract.getLock(createEventObject.index)
+            })
+          )
+        );
+
+      // Resolve the entire batch at once
+      const batchOfResults: any[] = await Promise.all(batchOfPromiseOfResults);
+
+      // Instantiate application level locks
+      let locks: Lock[] = [];
+      for (const result of batchOfResults) {
+        locks.push(
+          new Lock(
+            result.createEventObject.index,
+            result.createEventObject.originalOwner,
+            result.createEventObject.transfers,
+            parseInt(result.lock.expirationTime.toString()) * 1000, // Asjust timestamp to JS standard
+            await this.connectService.getTokenInfo(result.lock.token),
+            result.lock.value.toString()
+          )
+        );
+      }
+
+      this.locks.push(...locks);
+
+      // If it's the first time loading locks, then emit batch by batch
+      if (!this.locksInitialized$.getValue()) {
+        this.locks$.next(this.locks);
+        this.locksInitialized$.next(true);
+      }
+    }
+
+    // If it's NOT the first time loading locks, then emit the whole set
+    if (this.locksInitialized$.getValue())
+      this.locks$.next(this.locks);
+
+      this.loadingLocks$.next(false);
+
+    // Schedule the next call to loadLocks only if it's the latest call
+    // This prevents parallel fetch cycles when forcing loadLocks
+    if (this.latestLocksTimestamp === currentLoadLocksTimestamp)
+      setTimeout(() => this.loadLocks(), SYNC_RATE)
+  }
+
+  async getLock(index: number): Promise<Lock> {
+    const createEventObjects = await this.getCreateEventObjectsWithTransfers();
+
+    const createEventObject = createEventObjects
+      .find((create: LockCreateEventObject) => create.index === index);
+
+    if (!createEventObject) throw new Error("Could not find create event object.");
+    const lock = await this.liquidityLockerContract.getLock(createEventObject.index);
+
+    if (!lock) throw new Error("Could not find lock.");
+    const tokenInfo = await this.connectService.getTokenInfo(lock.token);
+
+    return new Lock(
+      createEventObject.index,
+      createEventObject.originalOwner,
+      createEventObject.transfers,
+      parseInt(lock.expirationTime.toString()) * 1000, // Asjust timestamp to JS standard
+      tokenInfo,
+      lock.value.toString()
+    );
+  }
+
+  private async getCreateEventObjectsWithTransfers() {
     const LockCreateFilter = this.liquidityLockerContract.filters.LockCreate();
     const LockTransferFilter = this.liquidityLockerContract.filters.LockTransfer();
 
@@ -121,86 +202,23 @@ export class LiquidityLockerService {
     // { [[index]]: [{ oldOwner, newOwner }] }
     const transfersMap: any = {};
 
-    locks.then(
-      ([
-        creates,
-        transfers
-      ]) =>
-      (
-        transfers.forEach((t: any) => {
-          transfersMap[t.args.index] = transfersMap[t.args.index] || [];
-          transfersMap[t.args.index].push({
-            oldOwner: t.args.oldOwner,
-            newOwner: t.args.newOwner
-          });
-        }),
-        creates.map((c: any) =>
-          new LockCreateEventObject(
-            Number(c.args.index.toString()),
-            c.args.owner,
-            transfersMap[c.args.index]
-          )
-        )
-      )
-    )
-    .then(async (creates) => {
+    const [ creates, transfers ] = await locks;
 
-      creates.sort((a: LockCreateEventObject, b: LockCreateEventObject) => b.index - a.index);
-
-      // Send groups of requests of BATCH_SIZE
-      for (let i = 0; i < creates.length; i += BATCH_SIZE) {
-
-        // Make a batch of promises to get the details of each lock
-        const batchOfPromiseOfLock = creates
-          .slice(i, i + BATCH_SIZE)
-          .map((createEventObject: LockCreateEventObject) =>
-            new Promise(async (resolve) =>
-              resolve({
-                createEventObject,
-                getLockResult: await this.liquidityLockerContract.getLock(createEventObject.index)
-              })
-            )
-          );
-
-        // Resolve the entire batch at once
-        const batchOfLock: any[] = await Promise.all(batchOfPromiseOfLock);
-
-        // Instantiate application level locks
-        let locks: Lock[] = [];
-        for (const lock of batchOfLock) {
-          locks.push(
-            new Lock(
-              lock.createEventObject.index,
-              lock.createEventObject.originalOwner,
-              lock.createEventObject.transfers,
-              parseInt(lock.getLockResult.expirationTime.toString()) * 1000, // Asjust timestamp to JS standard
-              await this.connectService.getTokenInfo(lock.getLockResult.token),
-              lock.getLockResult.value.toString()
-            )
-          );
-        }
-
-        this.locks.push(...locks);
-
-        // If it's the first time loading locks, then emit batch by batch
-        if (!this.locksInitialized$.getValue()) {
-          this.locks$.next(this.locks);
-          this.locksInitialized$.next(true);
-        }
-      }
-
-      // If it's NOT the first time loading locks, then emit the whole set
-      if (this.locksInitialized$.getValue())
-        this.locks$.next(this.locks);
-
-        this.loadingLocks$.next(false);
-
-      // Schedule the next call to loadLocks only if it's the latest call
-      // This prevents parallel fetch cycles when forcing loadLocks
-      if (this.latestLocksTimestamp === currentLoadLocksTimestamp)
-        setTimeout(() => this.loadLocks(), SYNC_RATE)
+    transfers.forEach((t: any) => {
+      transfersMap[t.args.index] = transfersMap[t.args.index] || [];
+      transfersMap[t.args.index].push({
+        oldOwner: t.args.oldOwner,
+        newOwner: t.args.newOwner
+      });
     });
 
+    return creates.map((c: any) =>
+      new LockCreateEventObject(
+        Number(c.args.index.toString()),
+        c.args.owner,
+        transfersMap[c.args.index]
+      )
+    );
   }
 
 }

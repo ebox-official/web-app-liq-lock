@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { LiquidityLockerService, Lock } from 'src/app/services/liquidity-locker.service';
@@ -18,7 +18,8 @@ export class LockListComponent implements OnInit {
   constructor(
     private connectService: ConnectService,
     private liquidityLockerService: LiquidityLockerService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {
     this.locksInitialized$ = this.liquidityLockerService.locksInitialized$;
 
@@ -50,6 +51,23 @@ export class LockListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    
+  }
+
+  lockViewInitialized(lock: Lock) {
+    const lockIntoViewParam = this.route.snapshot.queryParamMap.get("lockIntoView");
+    if (!lockIntoViewParam) return;
+    const lockIndex = parseInt(lockIntoViewParam);
+    const lockContainerEl = document.querySelector("#lock-" + lockIndex);
+    const lockEndEl = document.querySelector("#lock-" + lockIndex + "-end");
+    if (lock.index === lockIndex && lockContainerEl && lockEndEl) {
+      lockContainerEl.classList.add("lock-into-view");
+      lockEndEl.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+  }
+
+  navigateToDetails(lock: Lock) {
+    this.router.navigate([lock.index], { relativeTo: this.route });
   }
 
 }

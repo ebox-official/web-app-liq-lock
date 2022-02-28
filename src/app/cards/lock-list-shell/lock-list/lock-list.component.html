@@ -7,8 +7,8 @@
 </ng-container>
 <ng-template #locksLoaded>
     <ul class="list-group list-group-flush">
-        <li class="list-group-item" *ngFor="let l of locks$ | async; trackBy: trackLockByIndex">
-            <app-lock-list-item [lock]="l"></app-lock-list-item>
+        <li class="list-group-item lock-list-item-container" [id]="'lock-' + l.index" *ngFor="let l of locks$ | async; trackBy: trackLockByIndex" (click)="navigateToDetails(l)">
+            <app-lock-list-item [lock]="l" (viewInitialized)="lockViewInitialized(l)"></app-lock-list-item>
         </li>
     </ul>
 </ng-template>
