@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import BigNumber from 'bignumber.js';
 import { BehaviorSubject } from 'rxjs';
 import { NETWORK_MAP } from 'src/app/data/providers';
+import { LiquidityLockerService } from 'src/app/services/liquidity-locker.service';
 import { ValidatorsService } from 'src/app/services/validators.service';
+import { ToastColor, ToasterService } from 'src/app/toaster/toaster.service';
 import { ConnectService, Token } from '../connect/connect.service';
 
 @Component({
@@ -27,9 +30,14 @@ export class CreateLockComponent implements OnInit {
   unlockDateField: FormControl;
   unlockDateConfirmed: boolean;
 
+  interactingWithSmartContract: boolean;
+
   constructor(
     private connectService: ConnectService,
-    private validatorsService: ValidatorsService
+    private validatorsService: ValidatorsService,
+    private liquidityLockerService: LiquidityLockerService,
+    private toasterService: ToasterService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -126,6 +134,67 @@ export class CreateLockComponent implements OnInit {
   confirmUnlockDate() {
     this.unlockDateConfirmed = true;
     this.scrollTo("step-4-end");
+  }
+
+  async createLock() {
+    this.interactingWithSmartContract = true;
+    let receipt;
+    try {
+      this.toasterService.publish(
+        ToastColor.warning,
+        "Sending your create lock request..."
+      );
+      receipt = await this.liquidityLockerService.createLock(
+        this.selectedToken,
+        this.amountField.value,
+        this.unlockDateField.value
+      );
+    }
+    catch (err) {
+      this.toasterService.publish(ToastColor.danger, "Something went wrong.");
+      this.interactingWithSmartContract = false;
+      return console.log(err);
+    }
+
+    this.toasterService.publish(
+      ToastColor.success,
+      "Successfully created lock! Navigating to lock detail..."
+    );
+    this.interactingWithSmartContract = false;
+
+    // Re-load locks
+    this.liquidityLockerService.loadLocks();
+
+    // Extract lockIndex from receipt
+    const lockIndex = receipt.events[1].args.index.toString();
+    
+    // Navigate to lock detail after 1 second
+    setTimeout(() =>
+      this.router.navigate(["/lock-list/personal/" + lockIndex])
+    , 1000);
+  }
+
+  async approveUnlimitedSpending() {
+    this.interactingWithSmartContract = true;
+    try {
+      this.toasterService.publish(
+        ToastColor.warning,
+        "Sending your approve spending request..."
+      );
+      await this.liquidityLockerService
+        .approveUnlimitedSpending(this.selectedToken.address);
+    }
+    catch (err) {
+      this.toasterService.publish(ToastColor.danger, "Something went wrong.");
+      this.interactingWithSmartContract = false;
+      return console.error(err);
+    }
+
+    this.toasterService.publish(ToastColor.success, "Successfully approved spending!");
+    this.interactingWithSmartContract = false;
+
+    // Re-check token allowance
+    this.checkTokenAllowance(this.selectedToken);
   }
 
   date2timestamp(date: string) {

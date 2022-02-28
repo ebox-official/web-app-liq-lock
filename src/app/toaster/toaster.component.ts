@@ -25,7 +25,7 @@ export class ToasterComponent implements OnInit {
     div.innerHTML = `
     <div class="toast align-items-center ${toast.background} ${toast.color} border-0 mb-3" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="d-flex">
-        <div class="toast-body">
+        <div class="toast-body fs-5">
           ${toast.message}
         </div>
         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
@@ -34,12 +34,17 @@ export class ToasterComponent implements OnInit {
     `;
 
     // Place the toast inside its container
-    const toastEl = div.firstElementChild;
+    const toastEl: any = div.firstElementChild;
     this.anchor.nativeElement.appendChild(toastEl);
 
     // Initialize it and show it
     const bootstrapToast = new (window as any).bootstrap.Toast(toastEl);
     bootstrapToast.show();
+
+    // On toast hidden remove it from document flow
+    toastEl.addEventListener("hidden.bs.toast", () =>
+      toastEl.style.display = "none"
+    );
   }
 
 }

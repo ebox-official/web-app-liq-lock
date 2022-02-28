@@ -4,6 +4,7 @@ import { NETWORK_MAP } from 'src/app/data/providers';
 import { LIQUIDITY_LOCKER_ABI, TOKEN_DISPENSER_ABI } from '../data/abis';
 import { Contract } from 'ethers';
 import { BehaviorSubject } from 'rxjs';
+import { MAX_VALUE } from '../data/constants';
 
 class LockCreateEventObject {
 
@@ -183,7 +184,7 @@ export class LiquidityLockerService {
       createEventObject.index,
       createEventObject.originalOwner,
       createEventObject.transfers,
-      parseInt(lock.expirationTime.toString()) * 1000, // Asjust timestamp to JS standard
+      parseInt(lock.expirationTime.toString()) * 1000, // Adjust timestamp to JS standard
       tokenInfo,
       lock.value.toString()
     );
@@ -219,6 +220,31 @@ export class LiquidityLockerService {
         transfersMap[c.args.index]
       )
     );
+  }
+
+  async createLock(token: Token, _amount: string, _unlockTimestamp: number) {
+
+    const tokenAddress = token.address;
+    const amount = this.connectService.decimalToWei(_amount, token.decimals);
+    const unlockTimestamp = Math.floor(new Date(_unlockTimestamp).getTime() / 1000);
+
+    const tx = await this.liquidityLockerContract
+      .lockCreate(tokenAddress, amount, unlockTimestamp);
+    const receipt = await tx.wait();
+    return receipt;
+  }
+
+  // Approve unlimited spending
+  async approveUnlimitedSpending(tokenAddress: string): Promise<void> {
+
+    const contract = this.connectService.getTokenContract(tokenAddress);
+
+    const tx = await contract.approve(
+      this.liquidityLockerContractAddress,
+      MAX_VALUE
+    );
+    const receipt = await tx.wait();
+    return receipt;
   }
 
 }

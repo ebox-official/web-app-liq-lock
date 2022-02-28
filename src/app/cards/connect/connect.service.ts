@@ -271,8 +271,7 @@ export class ConnectService {
   // Get symbol, name, # of decimals and (if needed) wei balance (read only query)
   async getTokenInfo(tokenAddress: string, withBalance = false) {
 
-    const provider = this.provider;
-    const contract = new this.ethers.Contract(tokenAddress, ERC20_ABI, provider);
+    const contract = this.getTokenContract(tokenAddress);
 
     const [
       symbol,
@@ -302,25 +301,28 @@ export class ConnectService {
 
     // If it's the base token, then allowance is unlimited
     if (tokenAddress == ADDRESS_ZERO) return MAX_VALUE;
-    const provider = this.provider;
     const selectedAccount = this.selectedAccount$.getValue();
-    const contract = new this.ethers.Contract(tokenAddress, ERC20_ABI, provider);
+    const contract = this.getTokenContract(tokenAddress);
     return (await contract.allowance(selectedAccount, contractAddress)).toString();
   }
 
   // Get wei balance (read only query)
   async getTokenBalance(tokenAddress: string): Promise<string> {
 
-    const provider = this.provider;
     const selectedAccount = this.selectedAccount$.getValue();
 
     // If it's the base token, then use getBalance...
-    if (provider && selectedAccount && tokenAddress == ADDRESS_ZERO)
-      return (await provider.getBalance(selectedAccount)).toString();
+    if (selectedAccount && tokenAddress == ADDRESS_ZERO)
+      return (await this.provider.getBalance(selectedAccount)).toString();
 
     // ...otherwise instantiate an ERC20 contract and use balanceOf instead
-    const contract = new this.ethers.Contract(tokenAddress, ERC20_ABI, provider);
+    const contract = this.getTokenContract(tokenAddress);
     return (await contract.balanceOf(selectedAccount)).toString();
+  }
+
+  // Get token contract using generic ERC-20 ABI
+  getTokenContract(tokenAddress: string): ethers.Contract {
+    return new this.ethers.Contract(tokenAddress, ERC20_ABI, this.signer);
   }
   
 }
