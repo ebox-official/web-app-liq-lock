@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 
 export enum ToastColor {
-  primary = "bg-primary;text-black",
-  success = "bg-success;text-black",
-  warning = "bg-warning;text-black",
-  danger = "bg-danger;text-black"
+  primary = "bg-primary;text-white",
+  success = "bg-success;text-white",
+  warning = "bg-warning;text-dark",
+  danger = "bg-danger;text-dark"
 }
 
 export interface ToastObject {

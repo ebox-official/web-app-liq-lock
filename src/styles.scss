@@ -28,3 +28,10 @@ html.dark ::-webkit-scrollbar-thumb {
 .lh-0 {
   line-height: 1;
 }
+
+html.dark .btn-primary,
+html.dark .btn-outline-primary.active,
+.btn-primary,
+.btn-outline-primary.active {
+  color: var(--bs-white)!important;
+}
