@@ -131,7 +131,7 @@
                         (click)="setPercentageAmount(.25)">25%</button>
                     <button class="btn btn-sm btn-outline-primary"
                         [class.disabled]="interactingWithSmartContract"
-                        (click)="setPercentageAmount(.50)">50%</button>
+                        (click)="setPercentageAmount(.5)">50%</button>
                     <button class="btn btn-sm btn-outline-primary"
                         [class.disabled]="interactingWithSmartContract"
                         (click)="setPercentageAmount(.75)">75%</button>
@@ -156,10 +156,10 @@
                             'is-valid': unlockDateField.valid && (unlockDateField.dirty || unlockDateField.touched),
                             'is-invalid': unlockDateField.invalid && (unlockDateField.dirty || unlockDateField.touched)
                         }"
-                        type="datetime-local"
                         [min]="minDate"
                         [max]="maxDate"
                         [readonly]="interactingWithSmartContract"
+                        type="datetime-local"
                         class="form-control"
                         placeholder="Unlock date"
                         aria-label="Unlock date"
@@ -234,7 +234,7 @@
                         (click)="approveUnlimitedSpending()">Approve</button>
                     <button class="btn btn-lg btn-primary"
                         [class.disabled]="amountField.invalid || unlockDateField.invalid || hasToApprove || interactingWithSmartContract"
-                        (click)="createLock()">Lock</button>
+                        (click)="lockCreate()">Lock</button>
                     <div class="scroll-step" id="step-4-end"></div>
                 </div>
             </div>

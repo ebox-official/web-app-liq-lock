@@ -1,5 +1,6 @@
 .toaster-anchor {
     position: fixed;
+    z-index: 999;
     left: 50%;
     bottom: 0;
     transform: translateX(-50%);

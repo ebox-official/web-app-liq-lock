@@ -34,8 +34,6 @@ import { ConnectionInformationComponent } from './connection-information/connect
 import { LockListItemComponent } from './cards/lock-list-shell/lock-list-item/lock-list-item.component';
 import { LockComponent } from './cards/lock-list-shell/lock/lock.component';
 import { CreateLockComponent } from './cards/create-lock/create-lock.component';
-import { EditLockComponent } from './cards/edit-lock/edit-lock.component';
-import { WithdrawLockComponent } from './cards/withdraw-lock/withdraw-lock.component';
 import { PleaseConnectComponent } from './cards/please-connect/please-connect.component';
 import { WeiToDecimalPipe } from './pipes/wei-to-decimal.pipe';
 import { DecimalToWeiPipe } from './pipes/decimal-to-wei.pipe';
@@ -73,8 +71,6 @@ import { ScannerLinkComponent } from './scanner-link/scanner-link.component';
     LockListItemComponent,
     LockComponent,
     CreateLockComponent,
-    EditLockComponent,
-    WithdrawLockComponent,
     PleaseConnectComponent,
     WeiToDecimalPipe,
     DecimalToWeiPipe,

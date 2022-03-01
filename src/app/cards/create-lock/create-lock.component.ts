@@ -46,17 +46,14 @@ export class CreateLockComponent implements OnInit {
     this.tokenAddrField = new FormControl("", [this.validatorsService.addressValidator()]);
 
     this.amountField = new FormControl("");
-    this.amountConfirmed = false;
 
     const isoString = new Date(Date.now()).toISOString()
     this.minDate = isoString.substring(0, (isoString.indexOf("T")|0) + 6|0);
-    this.maxDate = "2032-01-01T01:01";
-
+    this.maxDate = "2025-01-01T01:01";
     this.unlockDateField = new FormControl("", [
       Validators.pattern("[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}"),
-      this.validatorsService.unlockDateValidator(this.maxDate)
+      this.validatorsService.unlockDateValidator(this.minDate, this.maxDate)
     ]);
-    this.unlockDateConfirmed = false;
   }
 
   trackTokenByAddress(index: number, token: Token) {
@@ -95,19 +92,19 @@ export class CreateLockComponent implements OnInit {
       });
   }
 
-  checkTokenAllowance(token: Token) {
-    const chainId = this.connectService.chainId$.getValue();
-    if (!chainId) return;
-    this.connectService.getTokenAllowance(
-      token.address,
-      NETWORK_MAP[chainId].contracts.liquidityLocker
-    )
-    .then(allowance => {
+  async checkTokenAllowance(token: Token) {
 
-      // It would be better to check if the amount the user is trying to lock is greater than the allowance, but it's OK nonetheless as we are always asking for MAX_VALUE allowance
-      if (token.balance)
-        this.hasToApprove = new BigNumber(token.balance).isGreaterThan(allowance);
-    });
+    const chainId = this.connectService.chainId$.getValue();
+
+    const allowance = await this.connectService
+      .getTokenAllowance(
+        token.address,
+        NETWORK_MAP[chainId].contracts.liquidityLocker
+      );
+    
+    if (token.balance)
+      this.hasToApprove = new BigNumber(token.balance)
+        .isGreaterThan(allowance);
   }
 
   addAmountValidator() {
@@ -116,10 +113,10 @@ export class CreateLockComponent implements OnInit {
   }
 
   setPercentageAmount(percentage: number) {
-    const balanceBn = new BigNumber(this.selectedToken.balance);
+    const balance = new BigNumber(this.selectedToken.balance);
     const decimalValue = this.connectService
       .weiToDecimal(
-        balanceBn.multipliedBy(percentage).integerValue().toString(),
+        balance.multipliedBy(percentage).integerValue().toString(),
         this.selectedToken.decimals
       );
     this.amountField.setValue(decimalValue);
@@ -136,15 +133,15 @@ export class CreateLockComponent implements OnInit {
     this.scrollTo("step-4-end");
   }
 
-  async createLock() {
+  async lockCreate() {
     this.interactingWithSmartContract = true;
     let receipt;
     try {
       this.toasterService.publish(
         ToastColor.warning,
-        "Sending your create lock request..."
+        "Sending the request for the creation of the lock..."
       );
-      receipt = await this.liquidityLockerService.createLock(
+      receipt = await this.liquidityLockerService.lockCreate(
         this.selectedToken,
         this.amountField.value,
         this.unlockDateField.value
@@ -158,7 +155,7 @@ export class CreateLockComponent implements OnInit {
 
     this.toasterService.publish(
       ToastColor.success,
-      "Successfully created lock! Navigating to lock detail..."
+      "The creation of the lock was successful! Navigating to lock details..."
     );
     this.interactingWithSmartContract = false;
 

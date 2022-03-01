@@ -178,7 +178,7 @@ export class LiquidityLockerService {
     const lock = await this.liquidityLockerContract.getLock(createEventObject.index);
 
     if (!lock) throw new Error("Could not find lock.");
-    const tokenInfo = await this.connectService.getTokenInfo(lock.token);
+    const tokenInfo = await this.connectService.getTokenInfo(lock.token, true);
 
     return new Lock(
       createEventObject.index,
@@ -222,7 +222,7 @@ export class LiquidityLockerService {
     );
   }
 
-  async createLock(token: Token, _amount: string, _unlockTimestamp: number) {
+  async lockCreate(token: Token, _amount: string, _unlockTimestamp: number) {
 
     const tokenAddress = token.address;
     const amount = this.connectService.decimalToWei(_amount, token.decimals);
@@ -234,7 +234,6 @@ export class LiquidityLockerService {
     return receipt;
   }
 
-  // Approve unlimited spending
   async approveUnlimitedSpending(tokenAddress: string): Promise<void> {
 
     const contract = this.connectService.getTokenContract(tokenAddress);
@@ -243,6 +242,43 @@ export class LiquidityLockerService {
       this.liquidityLockerContractAddress,
       MAX_VALUE
     );
+    const receipt = await tx.wait();
+    return receipt;
+  }
+
+  async lockAdd(lock: Lock, _amount: string) {
+
+    const amount = this.connectService.decimalToWei(_amount, lock.token.decimals);
+
+    const tx = await this.liquidityLockerContract
+      .lockAdd(lock.index, amount);
+    const receipt = await tx.wait();
+    return receipt;
+  }
+
+  async lockExtend(lock: Lock, _newUnlockTimestamp: string) {
+
+    const unlockTimestamp = Math.floor(new Date(_newUnlockTimestamp).getTime() / 1000);
+
+    const tx = await this.liquidityLockerContract
+      .lockExtend(lock.index, unlockTimestamp);
+    const receipt = await tx.wait();
+    return receipt;
+  }
+
+  async lockTransfer(lock: Lock, newOwnerAddress: string) {
+    const tx = await this.liquidityLockerContract
+      .lockTransfer(lock.index, newOwnerAddress);
+    const receipt = await tx.wait();
+    return receipt;
+  }
+
+  async lockWithdraw(lock: Lock, _amount: string) {
+
+    const amount = this.connectService.decimalToWei(_amount, lock.token.decimals);
+
+    const tx = await this.liquidityLockerContract
+      .lockWithdraw(lock.index, amount);
     const receipt = await tx.wait();
     return receipt;
   }
