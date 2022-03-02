@@ -9,4 +9,16 @@
     <li class="nav-item">
         <a class="btn btn-outline-primary" [routerLinkActive]="'active'" [routerLink]="['/lock-list']"><i class="bi bi-card-list me-2"></i>View locks</a>
     </li>
+    <ng-container *ngIf="(testTokens$ | async)!.length">
+        <li class="nav-item">
+            <a class="btn btn-outline-primary"
+                (click)="giveTestToken('Uni-LP', 0)"
+                [class.disabled]="interactingWithSmartContract"><i class="bi bi-coin me-2"></i>Get 100 Uni-LP</a>
+        </li>
+        <li class="nav-item">
+            <a class="btn btn-outline-primary"
+                (click)="giveTestToken('EBOX', 3)"
+                [class.disabled]="interactingWithSmartContract"><i class="bi bi-coin me-2"></i>Get 100 EBOX</a>
+        </li>
+    </ng-container>
 </ul>

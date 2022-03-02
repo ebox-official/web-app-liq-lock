@@ -9,15 +9,3 @@
 .status-text {
     font-size: 3rem!important;
 }
-
-.functionalities-grid {
-    display: grid;
-    gap: 1rem;
-    padding: 0 1rem;
-}
-
-@media screen and (min-width: 768px) {
-    .functionalities-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-}

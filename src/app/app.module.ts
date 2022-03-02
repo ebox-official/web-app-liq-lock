@@ -38,6 +38,7 @@ import { PleaseConnectComponent } from './cards/please-connect/please-connect.co
 import { WeiToDecimalPipe } from './pipes/wei-to-decimal.pipe';
 import { DecimalToWeiPipe } from './pipes/decimal-to-wei.pipe';
 import { ScannerLinkComponent } from './scanner-link/scanner-link.component';
+import { EditLockComponent } from './edit-lock/edit-lock.component';
 
 @NgModule({
   declarations: [
@@ -74,7 +75,8 @@ import { ScannerLinkComponent } from './scanner-link/scanner-link.component';
     PleaseConnectComponent,
     WeiToDecimalPipe,
     DecimalToWeiPipe,
-    ScannerLinkComponent
+    ScannerLinkComponent,
+    EditLockComponent
   ],
   imports: [
     BrowserModule,

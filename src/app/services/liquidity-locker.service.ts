@@ -5,6 +5,7 @@ import { LIQUIDITY_LOCKER_ABI, TOKEN_DISPENSER_ABI } from '../data/abis';
 import { Contract } from 'ethers';
 import { BehaviorSubject } from 'rxjs';
 import { MAX_VALUE } from '../data/constants';
+import { filter } from 'rxjs/operators';
 
 class LockCreateEventObject {
 
@@ -70,6 +71,9 @@ export class LiquidityLockerService {
     this.locks$ = new BehaviorSubject<Lock[]>(this.locks);
 
     this.connectService.isConnected$
+      .pipe(
+        filter(isConnected => isConnected)
+      )
       .subscribe(_ => {
 
         const chainId = this.connectService.chainId$.getValue();

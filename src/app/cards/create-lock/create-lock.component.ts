@@ -104,7 +104,7 @@ export class CreateLockComponent implements OnInit {
     
     if (token.balance)
       this.hasToApprove = new BigNumber(token.balance)
-        .isGreaterThan(allowance);
+        .isGreaterThanOrEqualTo(allowance);
   }
 
   addAmountValidator() {

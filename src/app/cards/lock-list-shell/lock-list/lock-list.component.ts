@@ -12,7 +12,7 @@ import { ConnectService } from '../../connect/connect.service';
 })
 export class LockListComponent implements OnInit {
 
-  locksInitialized$: BehaviorSubject<boolean>;
+  loadingLocks$: BehaviorSubject<boolean>;
   locks$: Observable<Lock[]>;
 
   constructor(
@@ -21,7 +21,7 @@ export class LockListComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router
   ) {
-    this.locksInitialized$ = this.liquidityLockerService.locksInitialized$;
+    this.loadingLocks$ = this.liquidityLockerService.loadingLocks$;
 
     // This componenet is rendered in two flavors: general and personal
     // General shows all the locks
