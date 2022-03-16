@@ -25,6 +25,11 @@
                         </div>
                         <span class="status-text">{{ !lock.isLocked() ? 'Unlocked' : 'Locked' }}</span>
                     </div>
+
+                    <ng-container *ngIf="lock.isEmpty">
+                        <h5 class="text-center my-3">This lock has been withdrawn completely.</h5>
+                    </ng-container>
+
                     <div>
                         <div><small class="text-muted">Index</small></div>
                         <span>{{ lock.index }}</span>
@@ -74,8 +79,17 @@
                         <div *ngIf="ownedBySelectedAccount"><small class="text-muted">Your balance of {{ lock.token.symbol }} is {{ lock.token.balance | weiToDecimal: lock.token.decimals }}</small></div>
                     </div>
 
-                    <app-edit-lock *ngIf="ownedBySelectedAccount" [lock]="lock" (lockEdited)="setState()"></app-edit-lock>
-
+                    <!-- start of lock edit section -->
+                    <ng-container *ngIf="!lock.isEmpty">
+                        <ng-container *ngIf="ownedBySelectedAccount; else notOwner">
+                            <app-edit-lock [lock]="lock" (lockEdited)="setState()"></app-edit-lock>
+                        </ng-container>
+                        <ng-template #notOwner>
+                            <h5 class="text-center my-3">You are not entitled to edit this lock.</h5>
+                        </ng-template>
+                    </ng-container>
+                    <!-- end of lock edit section -->
+                    
                 </div>
             </div>
         </ng-template>

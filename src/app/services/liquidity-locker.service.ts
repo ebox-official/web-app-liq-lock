@@ -19,6 +19,8 @@ class LockCreateEventObject {
 
 export class Lock {
 
+  isEmpty: boolean;
+
   constructor(
     public index: number,
     public originalOwner: string,
@@ -26,7 +28,9 @@ export class Lock {
     public expirationTime: number,
     public token: Token,
     public value: string
-  ) { }
+  ) {
+    this.isEmpty = value === "0";
+  }
 
   getOwner() {
     if (this.transfers)
