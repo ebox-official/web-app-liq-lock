@@ -14,7 +14,7 @@ export class AppComponent {
 
   setBackground(isDarkmode: boolean) {
     this.appBody.nativeElement.style.backgroundImage = isDarkmode ?
-      "url(/assets/img/bg-dark.svg)" :
-      "url(/assets/img/bg.svg)";
+      "url(assets/img/bg-dark.svg)" :
+      "url(assets/img/bg.svg)";
   }
 }
