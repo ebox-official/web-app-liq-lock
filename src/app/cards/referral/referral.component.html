@@ -1,0 +1,28 @@
+<app-card-archetype>
+    <ng-container class="card-header-content">Referral program</ng-container>
+    <ng-container class="card-body-content">
+        <div class="referral-hero">
+            <div class="referral-hero__left col-md-6">
+                <h2 class="referral-hero__title display-6">Your referral link</h2>
+                <div class="referral-hero__text-wrap">
+                    <p>Copy-paste the link down below and share with project administrators to earn EBOX tokens!</p>
+                    <small>For more info read <a href="#">ebox Referral Program</a>.</small>
+                </div>
+                <ng-container *ngIf="isLoading else showShareLink">
+                    <div class="text-center">
+                        <div class="spinner-border"></div>
+                    </div>
+                </ng-container>
+                <ng-template #showShareLink>
+                    <div class="referral-hero__link">
+                        <app-copyable-text [text]="shareLink"></app-copyable-text>
+                    </div>
+                </ng-template>
+            </div>
+            <img class="floating-ebox-logo" src="assets/img/ebox-logo.svg" alt="ebox logo">
+        </div>
+    </ng-container>
+    <ng-container class="card-footer-content">
+        <app-copyright></app-copyright>
+    </ng-container>
+</app-card-archetype>

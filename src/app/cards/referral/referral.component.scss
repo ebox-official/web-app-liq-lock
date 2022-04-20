@@ -1,0 +1,55 @@
+.referral-hero {
+    background-image: url('/assets/img/referral/referral-background.jpg');
+    background-size: cover;
+    color: #333;
+    padding: 3rem 1.75rem;
+    position: relative;
+}
+
+.referral-hero__left {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.referral-hero__title {
+    font-weight: bold;
+    margin: 0;
+}
+
+.referral-hero__text-wrap p {
+    font-weight: bold;
+    margin: 0;
+    opacity: 0.9;
+}
+
+.referral-hero__text-wrap small {
+    opacity: 0.8;
+}
+
+.referral-hero__text-wrap a {
+    color: var(--bs-secondary);
+}
+
+.referral-hero__link {
+    background-color: #000a;
+    border-radius: 4px;
+    box-shadow: 0 4px 10px 2px #0003;
+    justify-self: start;
+}
+
+.floating-ebox-logo {
+    bottom: 2rem;
+    position: absolute;
+    right: 1rem;
+    width: 25%;
+    animation: Float 5s ease-in-out infinite alternate forwards;
+}
+
+@keyframes Float {
+    from {
+        transform: translateY(-1rem);
+    }
+    to {
+        transform: translateY(1rem);
+    }
+}

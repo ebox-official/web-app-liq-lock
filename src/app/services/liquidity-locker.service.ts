@@ -7,11 +7,10 @@ import { BehaviorSubject } from 'rxjs';
 import { MAX_VALUE } from '../data/constants';
 import { filter } from 'rxjs/operators';
 
-class LockCreateEventObject {
+export class LockInitialData {
 
   constructor(
     public index: number,
-    public originalOwner: string,
     public transfers: any[] | undefined
   ) { }
 
@@ -23,8 +22,8 @@ export class Lock {
 
   constructor(
     public index: number,
-    public originalOwner: string,
     public transfers: any[] | undefined, // 0: oldest, N: newest
+    public owner: string,
     public expirationTime: number,
     public token: Token,
     public value: string
@@ -36,7 +35,7 @@ export class Lock {
     if (this.transfers)
       return [...this.transfers].pop().newOwner;
     else
-      return this.originalOwner;
+      return this.owner;
   }
 
   isLocked() {
@@ -58,21 +57,37 @@ export class LiquidityLockerService {
   tokenDispenserContractAddress: string;
   tokenDispenserContract: Contract;
 
-  loadingLocks$: BehaviorSubject<boolean>;
-  locksInitialized$: BehaviorSubject<boolean>;
+  locksInitialData: LockInitialData[];
   locks: Lock[];
   locks$: BehaviorSubject<Lock[]>;
-  latestLocksTimestamp: number;
+  locksLoading$: BehaviorSubject<boolean>;
+  locksInitialized$: BehaviorSubject<boolean>;
+  locksTimestamp: number;
+
+  personalLocksInitialData: LockInitialData[];
+  personalLocks: Lock[];
+  personalLocks$: BehaviorSubject<Lock[]>;
+  personalLocksLoading$: BehaviorSubject<boolean>;
+  personalLocksInitialized$: BehaviorSubject<boolean>;
+  personalLocksTimestamp: number;
 
   fee: number;
 
   constructor(
     private connectService: ConnectService
   ) {
-    this.loadingLocks$ = new BehaviorSubject<boolean>(false);
-    this.locksInitialized$ = new BehaviorSubject<boolean>(false);
+
+    this.locksInitialData = [];
     this.locks = [];
     this.locks$ = new BehaviorSubject<Lock[]>(this.locks);
+    this.locksLoading$ = new BehaviorSubject<boolean>(false);
+    this.locksInitialized$ = new BehaviorSubject<boolean>(false);
+
+    this.personalLocksInitialData = [];
+    this.personalLocks = [];
+    this.personalLocks$ = new BehaviorSubject<Lock[]>(this.personalLocks);
+    this.personalLocksLoading$ = new BehaviorSubject<boolean>(false);
+    this.personalLocksInitialized$ = new BehaviorSubject<boolean>(false);
 
     this.connectService.isConnected$
       .pipe(
@@ -112,27 +127,41 @@ export class LiquidityLockerService {
       });
   }
 
-  async loadLocks() {
+  loadLocks() {
+    this.generalLocksLoop();
+    this.personalLocksLoop();
+  }
+
+  async generalLocksLoop() {
+
     const currentLoadLocksTimestamp = Date.now();
+    this.locksTimestamp = currentLoadLocksTimestamp;
     
-    this.loadingLocks$.next(true);
+    this.locksLoading$.next(true);
     this.locks = [];
 
-    const createEventObjects = await this.getCreateEventObjectsWithTransfers();;
+    const locksInitData = await this.getLocksInitialData();
+    locksInitData.sort((a, b) => b.index - a.index);
 
-    createEventObjects.reverse();
+    // Clean initial data array
+    while (this.locksInitialData.length)
+      this.locksInitialData.pop();
+    
+    // Populate initial data array
+    for (const lockInitData of locksInitData)
+      this.locksInitialData.push(lockInitData);
 
     // Send groups of requests of BATCH_SIZE
-    for (let i = 0; i < createEventObjects.length; i += BATCH_SIZE) {
+    for (let i = 0; i < locksInitData.length; i += BATCH_SIZE) {
 
       // Make a batch of promises to get the details of each lock
-      const batchOfPromiseOfResults = createEventObjects
+      const batchOfPromiseOfResults = locksInitData
         .slice(i, i + BATCH_SIZE)
-        .map((createEventObject: LockCreateEventObject) =>
+        .map((lockInitData: LockInitialData) =>
           new Promise(async (resolve) =>
             resolve({
-              createEventObject,
-              lock: await this.liquidityLockerContract.getLock(createEventObject.index)
+              lockInitData,
+              lock: await this.liquidityLockerContract.getLock(lockInitData.index)
             })
           )
         );
@@ -141,14 +170,14 @@ export class LiquidityLockerService {
       const batchOfResults: any[] = await Promise.all(batchOfPromiseOfResults);
 
       // Instantiate application level locks
-      let locks: Lock[] = [];
+      const locks: Lock[] = [];
       for (const result of batchOfResults) {
         locks.push(
           new Lock(
-            result.createEventObject.index,
-            result.createEventObject.originalOwner,
-            result.createEventObject.transfers,
-            parseInt(result.lock.expirationTime.toString()) * 1000, // Asjust timestamp to JS standard
+            result.lockInitData.index,
+            result.lockInitData.transfers,
+            result.lock.owner,
+            parseInt(result.lock.expirationTime.toString()) * 1000,
             await this.connectService.getTokenInfo(result.lock.token),
             result.lock.value.toString()
           )
@@ -158,61 +187,120 @@ export class LiquidityLockerService {
       this.locks.push(...locks);
 
       // If it's the first time loading locks, then emit batch by batch
-      if (!this.locksInitialized$.getValue()) {
+      if (!this.locksInitialized$.getValue())
         this.locks$.next(this.locks);
-        this.locksInitialized$.next(true);
-      }
     }
+
+    // Mark has initialized
+    if (!this.locksInitialized$.getValue())
+      this.locksInitialized$.next(true);
 
     // If it's NOT the first time loading locks, then emit the whole set
     if (this.locksInitialized$.getValue())
       this.locks$.next(this.locks);
 
-      this.loadingLocks$.next(false);
+    this.locksLoading$.next(false);
 
     // Schedule the next call to loadLocks only if it's the latest call
     // This prevents parallel fetch cycles when forcing loadLocks
-    if (this.latestLocksTimestamp === currentLoadLocksTimestamp)
-      setTimeout(() => this.loadLocks(), SYNC_RATE)
+    if (this.locksTimestamp === currentLoadLocksTimestamp)
+      setTimeout(() => this.generalLocksLoop(), SYNC_RATE);
+  }
+
+  async personalLocksLoop() {
+
+    const selectedAccount = this.connectService.selectedAccount$.getValue();
+
+    const currentLoadLocksTimestamp = Date.now();
+    this.personalLocksTimestamp = currentLoadLocksTimestamp;
+    
+    this.personalLocksLoading$.next(true);
+    this.personalLocks = [];
+
+    const pLocksInitData = await this.getLocksInitialData(selectedAccount);
+    pLocksInitData.sort((a, b) => b.index - a.index);
+
+    // Clean initial data array
+    while (this.personalLocksInitialData.length)
+      this.personalLocksInitialData.pop();
+    
+    // Populate initial data array
+    for (const pLockInitData of pLocksInitData)
+      this.personalLocksInitialData.push(pLockInitData);
+
+    for (const pLockInitData of pLocksInitData) {
+
+      const lock = await this.liquidityLockerContract.getLock(pLockInitData.index);
+
+      this.personalLocks.push(
+        new Lock(
+          pLockInitData.index,
+          pLockInitData.transfers,
+          lock.owner,
+          parseInt(lock.expirationTime.toString()) * 1000,
+          await this.connectService.getTokenInfo(lock.token),
+          lock.value.toString()
+        )
+      );
+
+      // If it's the first time loading locks, then emit batch by batch
+      if (!this.personalLocksInitialized$.getValue())
+        this.personalLocks$.next(this.personalLocks);
+    }
+
+    // Mark has initialized
+    if (!this.personalLocksInitialized$.getValue())
+      this.personalLocksInitialized$.next(true);
+
+    // If it's NOT the first time loading locks, then emit the whole set
+    if (this.personalLocksInitialized$.getValue())
+      this.personalLocks$.next(this.personalLocks);
+
+    this.personalLocksLoading$.next(false);
+
+    // Schedule the next call to loadLocks only if it's the latest call
+    // This prevents parallel fetch cycles when forcing loadLocks
+    if (this.personalLocksTimestamp === currentLoadLocksTimestamp)
+      setTimeout(() => this.personalLocksLoop(), SYNC_RATE);
   }
 
   async getLock(index: number): Promise<Lock> {
-    const createEventObjects = await this.getCreateEventObjectsWithTransfers();
 
-    const createEventObject = createEventObjects
-      .find((create: LockCreateEventObject) => create.index === index);
+    const locksInitData = await this.getLocksInitialData();
 
-    if (!createEventObject) throw new Error("Could not find create event object.");
-    const lock = await this.liquidityLockerContract.getLock(createEventObject.index);
+    const lockInitData = locksInitData
+      .find((lockInitData: LockInitialData) => lockInitData.index === index);
+
+    if (!lockInitData) throw new Error("Could not find lock initial object.");
+    const lock = await this.liquidityLockerContract.getLock(lockInitData.index);
 
     if (!lock) throw new Error("Could not find lock.");
     const tokenInfo = await this.connectService.getTokenInfo(lock.token, true);
 
     return new Lock(
-      createEventObject.index,
-      createEventObject.originalOwner,
-      createEventObject.transfers,
-      parseInt(lock.expirationTime.toString()) * 1000, // Adjust timestamp to JS standard
+      lockInitData.index,
+      lockInitData.transfers,
+      lock.owner,
+      parseInt(lock.expirationTime.toString()) * 1000,
       tokenInfo,
       lock.value.toString()
     );
   }
 
-  private async getCreateEventObjectsWithTransfers() {
-    const LockCreateFilter = this.liquidityLockerContract.filters.LockCreate();
+  private async getLocksInitialData(address?: string) {
+
+    const LockCreateFilter = this.liquidityLockerContract.filters.LockCreate(null, address);
     const LockTransferFilter = this.liquidityLockerContract.filters.LockTransfer();
 
-    // Work out the entries in parallel with Promise.all()
-    const locks = Promise.all([
+    const createsTransfersPromise = Promise.all([
       this.liquidityLockerContract.queryFilter(LockCreateFilter),
       this.liquidityLockerContract.queryFilter(LockTransferFilter)
     ]);
 
+    const [ creates, transfers ] = await createsTransfersPromise;
+
     // { [[index]]: [{ oldOwner, newOwner }] }
     const transfersMap: any = {};
-
-    const [ creates, transfers ] = await locks;
-
     transfers.forEach((t: any) => {
       transfersMap[t.args.index] = transfersMap[t.args.index] || [];
       transfersMap[t.args.index].push({
@@ -221,11 +309,28 @@ export class LiquidityLockerService {
       });
     });
 
-    return creates.map((c: any) =>
-      new LockCreateEventObject(
-        Number(c.args.index.toString()),
-        c.args.owner,
-        transfersMap[c.args.index]
+    // LockCreateFilter when passed the address can't find locks which are transferred, so we'll have to find them via LockTransferFilter
+    const indices = new Set();
+    for (const index in transfersMap) {
+      if (transfersMap.hasOwnProperty(index)) {
+        const currentOwner = transfersMap[index][transfersMap[index].length - 1].newOwner;
+        if (currentOwner === address) {
+          indices.add(index);
+        }
+      }
+    }
+
+    for (const create of creates) {
+      const index = (create as any).args.index.toString();
+      if (!indices.has(index)) {
+        indices.add(index);
+      }
+    }
+
+    return [...indices].map((index: any) =>
+      new LockInitialData(
+        Number(index),
+        transfersMap[index]
       )
     );
   }

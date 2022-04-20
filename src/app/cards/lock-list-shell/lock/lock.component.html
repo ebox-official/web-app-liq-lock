@@ -5,93 +5,106 @@
     </ng-container>
     <ng-container class="card-body-content">
 
-        <ng-container *ngIf="!lock; else lockLoaded">
-            <div class="text-center my-4">
-                <div class="spinner-border" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
+        <ng-container *ngIf="lockRetrievalError !== -1; else lockFound">
+            <div class="p-3 text-center">
+                <h1 class="display-5 fw-bolder text-primary">NOT FOUND</h1>
+                <p class="mb-2 lead fw-bold">Lock with index <span class="text-primary">{{ lockRetrievalError }}</span> doesn't exist!</p>
+                <p class="col-md-6 lh-1 mx-auto text-muted"><small>If you think there's a mistake please don't hesitate to contact ebox in our <a href="https://t.me/ebox_testnet" target="_blank">Official Testnet Assitance</a> channel on Telegram.</small></p>
             </div>
         </ng-container>
-        <ng-template #lockLoaded>
-            <div class="p-3">
-                <div class="d-grid gap-2">
-                    <div class="text-center" [class.text-primary]="lock.isLocked()">
-                        <div>
-                            <i class="status-icon bi"
-                                [ngClass]="{
-                                    'bi-lock-fill': lock.isLocked(),
-                                    'bi-unlock': !lock.isLocked()
-                                }"></i>
-                        </div>
-                        <span class="status-text">{{ !lock.isLocked() ? 'Unlocked' : 'Locked' }}</span>
+        <ng-template #lockFound>
+            <ng-container *ngIf="!lock; else lockLoaded">
+                <div class="text-center my-4">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
                     </div>
-
-                    <ng-container *ngIf="lock.isEmpty">
-                        <h5 class="text-center my-3">This lock has been withdrawn completely.</h5>
-                    </ng-container>
-
-                    <div>
-                        <div><small class="text-muted">Index</small></div>
-                        <span>{{ lock.index }}</span>
-                    </div>
-                    <div>
-                        <div><small class="text-muted">Expiration date</small></div>
-                        <span>{{ lock.expirationTime | formatDate }}
-                            <i class="bi ms-2"
-                                [ngClass]="{
-                                    'bi-lock-fill': lock.isLocked(),
-                                    'text-primary': lock.isLocked(),
-                                    'bi-unlock': !lock.isLocked()
-                                }"></i>
-                        </span>
-                    </div>
-                    <div>
-                        <div><small class="text-muted">Current owner</small></div>
-                        <app-scanner-link [address]="lock.getOwner()"></app-scanner-link>
-                    </div>
-                    <div *ngIf="lock.transfers">
-                        <div><small class="text-muted">Transfers of ownership</small></div>
-                        <ul class="list-group">
-                            <li class="list-group-item d-flex flex-wrap justify-content-between" *ngFor="let t of lock.transfers">
-                                <div>
-                                    <small class="text-muted">Old owner</small>
-                                    <div>
-                                        <app-scanner-link [address]="t.oldOwner"></app-scanner-link>
-                                    </div>
-                                </div>
-                                <div>
-                                    <small class="text-muted">New owner</small>
-                                    <div>
-                                        <app-scanner-link [address]="t.newOwner"></app-scanner-link>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                    <div>
-                        <div><small class="text-muted">Token</small></div>
-                        <div><span>{{ lock.token.symbol }}</span></div>
-                        <app-scanner-link [address]="lock.token.address"></app-scanner-link>
-                    </div>
-                    <div>
-                        <div><small class="text-muted">Value</small></div>
-                        <div class="fs-4 lh-0">{{ lock.value | weiToDecimal: lock.token.decimals }}</div>
-                        <div *ngIf="ownedBySelectedAccount"><small class="text-muted">Your balance of {{ lock.token.symbol }} is {{ lock.token.balance | weiToDecimal: lock.token.decimals }}</small></div>
-                    </div>
-
-                    <!-- start of lock edit section -->
-                    <ng-container *ngIf="!lock.isEmpty">
-                        <ng-container *ngIf="ownedBySelectedAccount; else notOwner">
-                            <app-edit-lock [lock]="lock" (lockEdited)="setState()"></app-edit-lock>
-                        </ng-container>
-                        <ng-template #notOwner>
-                            <h5 class="text-center my-3">You are not entitled to edit this lock.</h5>
-                        </ng-template>
-                    </ng-container>
-                    <!-- end of lock edit section -->
-                    
                 </div>
-            </div>
+            </ng-container>
+            <ng-template #lockLoaded>
+                <div class="p-3">
+                    <div class="d-grid gap-2">
+    
+                        <div class="main-info">
+                            <div class="main-info__index">
+                                <div><small class="text-muted">Index</small></div>
+                                <span>{{ lock.index }}</span>
+                            </div>
+    
+                            <div class="main-info__status" [class.text-primary]="lock.isLocked()">
+                                <div><small class="text-muted">Status</small></div>
+                                <span class="status-text">{{ !lock.isLocked() ? 'Unlocked' : 'Locked' }}</span>
+                            </div>
+                            
+                            <div class="main-info__expiration">
+                                <div><small class="text-muted">Expiration date</small></div>
+                                <span>{{ lock.expirationTime | formatDate }}
+                                    <i class="bi ms-2"
+                                        [ngClass]="{
+                                            'bi-lock-fill': lock.isLocked(),
+                                            'text-primary': lock.isLocked(),
+                                            'bi-unlock': !lock.isLocked()
+                                        }"></i>
+                                </span>
+                            </div>
+    
+                            <ng-container *ngIf="lock.isEmpty">
+                                <h5 class="main-info__withdrawn">This lock has been withdrawn completely.</h5>
+                            </ng-container>
+                        </div>
+
+                        <div>
+                            <div><small class="text-muted">Share link</small></div>
+                            <app-copyable-text [text]="shareLink"></app-copyable-text>
+                        </div>
+    
+                        <div>
+                            <div><small class="text-muted">Current owner</small></div>
+                            <app-scanner-link [address]="lock.getOwner()"></app-scanner-link>
+                        </div>
+                        <div *ngIf="lock.transfers">
+                            <div><small class="text-muted">Transfers of ownership</small></div>
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex flex-wrap justify-content-between" *ngFor="let t of lock.transfers">
+                                    <div>
+                                        <small class="text-muted">Old owner</small>
+                                        <div>
+                                            <app-scanner-link [address]="t.oldOwner"></app-scanner-link>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted">New owner</small>
+                                        <div>
+                                            <app-scanner-link [address]="t.newOwner"></app-scanner-link>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <div><small class="text-muted">Token</small></div>
+                            <div><span>{{ lock.token.symbol }}</span></div>
+                            <app-scanner-link [address]="lock.token.address"></app-scanner-link>
+                        </div>
+                        <div>
+                            <div><small class="text-muted">Value</small></div>
+                            <div class="fs-4 lh-0">{{ lock.value | weiToDecimal: lock.token.decimals }}</div>
+                            <div *ngIf="ownedBySelectedAccount"><small class="text-muted">Your balance of {{ lock.token.symbol }} is {{ lock.token.balance | weiToDecimal: lock.token.decimals }}</small></div>
+                        </div>
+    
+                        <!-- start of lock edit section -->
+                        <ng-container *ngIf="!lock.isEmpty">
+                            <ng-container *ngIf="ownedBySelectedAccount; else notOwner">
+                                <app-edit-lock [lock]="lock" (lockEdited)="setState()"></app-edit-lock>
+                            </ng-container>
+                            <ng-template #notOwner>
+                                <h5 class="text-center my-3">You are not entitled to edit this lock.</h5>
+                            </ng-template>
+                        </ng-container>
+                        <!-- end of lock edit section -->
+                        
+                    </div>
+                </div>
+            </ng-template>
         </ng-template>
 
     </ng-container>

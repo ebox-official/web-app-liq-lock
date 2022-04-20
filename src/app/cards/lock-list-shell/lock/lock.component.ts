@@ -13,17 +13,25 @@ export class LockComponent implements OnInit {
   lockIndex: number;
   lock: Lock;
   ownedBySelectedAccount: boolean;
+  lockRetrievalError: number;
+
+  shareLink: string;
 
   constructor(
     private route: ActivatedRoute,
     private liquidityLockerService: LiquidityLockerService,
     private connectService: ConnectService
   ) {
-
+    
+    // Set initial state of lockRetrievalError to -1 (which means not in error)
+    this.lockRetrievalError = -1;
+    
     // Get the index from the URL, load the resource statelessly in ngOnInit
     const lockIndexParam = this.route.snapshot.paramMap.get("index");
     if (!lockIndexParam) throw new Error("Could not get lock index.");
     this.lockIndex = parseInt(lockIndexParam);
+
+    this.shareLink = `${document.location.origin}/lock-list/find/${this.lockIndex}`;
   }
 
   ngOnInit() {
@@ -33,7 +41,13 @@ export class LockComponent implements OnInit {
   async setState() {
 
     // Load lock
-    this.lock = await this.liquidityLockerService.getLock(this.lockIndex);
+    try {
+      this.lock = await this.liquidityLockerService.getLock(this.lockIndex);
+    }
+    catch (err) {
+      this.lockRetrievalError = this.lockIndex;
+      return;
+    }
 
     // Check ownership
     const owner = this.lock.getOwner();

@@ -12,38 +12,30 @@ import { ConnectService } from '../../connect/connect.service';
 })
 export class LockListComponent implements OnInit {
 
-  loadingLocks$: BehaviorSubject<boolean>;
   locks$: Observable<Lock[]>;
+  locksLoading$: BehaviorSubject<boolean>;
+  locksInitialized$: BehaviorSubject<boolean>;
 
   constructor(
-    private connectService: ConnectService,
     private liquidityLockerService: LiquidityLockerService,
     private route: ActivatedRoute,
     private router: Router
   ) {
-    this.loadingLocks$ = this.liquidityLockerService.loadingLocks$;
-
+    
     // This componenet is rendered in two flavors: general and personal
     // General shows all the locks
     // Personal shows only the locks owned by the user
     const viewMode = this.route.snapshot.data["viewMode"];
-    this.locks$ = this.liquidityLockerService.locks$
-      .pipe(
-        map((locks: Lock[]) => {
-
-          if (viewMode === "general")
-            return locks;
-          return locks.filter((lock: Lock) => {
-            const selectedAccount = this.connectService.selectedAccount$.getValue();
-            if (lock.transfers) {
-              const latestTransfer = lock.transfers[lock.transfers.length - 1];
-              return latestTransfer.newOwner === selectedAccount;
-            }
-            return lock.originalOwner === selectedAccount;
-          });
-
-        })
-      );
+    if (viewMode === "personal") {
+      this.locks$ = this.liquidityLockerService.personalLocks$;
+      this.locksLoading$ = this.liquidityLockerService.personalLocksLoading$;
+      this.locksInitialized$ = this.liquidityLockerService.personalLocksInitialized$;
+    }
+    else {
+      this.locks$ = this.liquidityLockerService.locks$;
+      this.locksLoading$ = this.liquidityLockerService.locksLoading$;
+      this.locksInitialized$ = this.liquidityLockerService.locksInitialized$;
+    }
   }
 
   trackLockByIndex(index: number, lock: Lock) {

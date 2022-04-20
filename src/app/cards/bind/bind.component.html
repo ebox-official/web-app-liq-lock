@@ -1,0 +1,35 @@
+<app-card-archetype>
+    <ng-container class="card-header-content">Referral binding</ng-container>
+    <ng-container class="card-body-content">
+        <div class="referral-hero">
+            <div class="referral-hero__left col-md-6">
+                <h2 class="referral-hero__title display-6">Congratulations</h2>
+                <div class="referral-hero__text-wrap">
+                    <p>Welcome to ebox Liquidity Locker!<br>You've been referred by:</p>
+                    <ng-container *ngIf="isLoading else showGiverAddress">
+                        <div class="text-center">
+                            <div class="spinner-border"></div>
+                        </div>
+                    </ng-container>
+                    <ng-template #showGiverAddress>
+                        <p class="font-monospace m-1">{{ giverAddress }}</p>
+                    </ng-template>
+                    <small>For more info read <a href="#">ebox Referral Program</a>.</small>
+                </div>
+                <div class="mb-4">
+                    <h5>What can you do?</h5>
+                    <div class="d-inline-flex flex-wrap gap-2 list-of-actions">
+                        <a [routerLink]="['/create-lock']" class="btn btn-primary shadow"><i class="bi bi-lock-fill me-2"></i>Create lock</a>
+                        <a [routerLink]="['/lock-list/find']" class="btn btn-primary shadow"><i class="bi bi-card-list me-2"></i>Find a lock</a>
+                        <a [routerLink]="['/lock-list/personal']" class="btn btn-primary shadow"><i class="bi bi-card-list me-2"></i>View your locks</a>
+                        <a [routerLink]="['/lock-list/general']" class="btn btn-primary shadow"><i class="bi bi-card-list me-2"></i>View all locks</a>
+                    </div>
+                </div>
+            </div>
+            <img class="floating-ebox-logo" src="assets/img/ebox-logo.svg" alt="ebox logo">
+        </div>
+    </ng-container>
+    <ng-container class="card-footer-content">
+        <app-copyright></app-copyright>
+    </ng-container>
+</app-card-archetype>

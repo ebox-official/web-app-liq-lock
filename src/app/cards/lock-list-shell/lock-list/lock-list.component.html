@@ -1,4 +1,4 @@
-<ng-container *ngIf="(loadingLocks$ | async) && (locks$ | async)!.length === 0; else locksLoaded">
+<ng-container *ngIf="(locksLoading$ | async) && (locks$ | async)!.length === 0; else locksLoaded">
     <div class="text-center my-4">
         <div class="spinner-border" role="status">
             <span class="visually-hidden">Loading...</span>
@@ -7,12 +7,16 @@
 </ng-container>
 <ng-template #locksLoaded>
     <ul class="list-group list-group-flush">
-        <li class="list-group-item lock-list-item-container" [id]="'lock-' + l.index" *ngFor="let l of locks$ | async; trackBy: trackLockByIndex" (click)="navigateToDetails(l)">
+        <li class="list-group-item lock-list-item-container"
+            [class.just-loaded]="(locksLoading$ | async) && !(locksInitialized$ | async)"
+            [id]="'lock-' + l.index"
+            *ngFor="let l of locks$ | async; trackBy: trackLockByIndex"
+            (click)="navigateToDetails(l)">
             <app-lock-list-item [lock]="l" (viewInitialized)="lockViewInitialized(l)"></app-lock-list-item>
         </li>
     </ul>
 </ng-template>
-<ng-container *ngIf="!(loadingLocks$ | async) && (locks$ | async)!.length === 0">
+<ng-container *ngIf="!(locksLoading$ | async) && (locks$ | async)!.length === 0">
     <div class="px-3 py-4">There are no locks</div>
 </ng-container>
 

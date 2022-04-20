@@ -1,0 +1,21 @@
+.copyable-text-wrap {
+    align-items: center;
+    background-color: #8881;
+    border: 1px solid var(--bs-primary);
+    border-radius: .25rem;
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    justify-content: center;
+    padding: .125rem;
+}
+
+.copyable-text__input {
+    background-color: #0000;
+    border: none;
+    color: var(--bs-primary);
+    font-size: 14px;
+    margin-left: 1rem;
+    overflow: hidden;
+    white-space: nowrap;
+}

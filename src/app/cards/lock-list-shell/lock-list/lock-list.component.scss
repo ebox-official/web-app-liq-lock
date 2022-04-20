@@ -3,5 +3,47 @@
 }
 
 .lock-into-view {
-    border: 2px solid var(--bs-primary)!important;
+    box-shadow: inset 0 0 1rem .1rem var(--bs-primary);
+}
+
+.lock-list-item-container.just-loaded {
+    opacity: 0;
+    transform: translateX(-10%);
+    animation-duration: .25s;
+    animation-timing-function: ease-out;
+    animation-name: FadeInFromLeft;
+    animation-fill-mode: forwards;
+}
+
+@keyframes FadeInFromLeft {
+    from { opacity: 0; transform: translateX(-10%); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.lock-list-item-container.just-loaded:nth-of-type(2) {
+    animation-delay: .05s;
+}
+.lock-list-item-container.just-loaded:nth-of-type(3) {
+    animation-delay: calc(.05s * 2);
+}
+.lock-list-item-container.just-loaded:nth-of-type(4) {
+    animation-delay: calc(.05s * 3);
+}
+.lock-list-item-container.just-loaded:nth-of-type(5) {
+    animation-delay: calc(.05s * 4);
+}
+.lock-list-item-container.just-loaded:nth-of-type(6) {
+    animation-delay: calc(.05s * 5);
+}
+.lock-list-item-container.just-loaded:nth-of-type(7) {
+    animation-delay: calc(.05s * 6);
+}
+.lock-list-item-container.just-loaded:nth-of-type(8) {
+    animation-delay: calc(.05s * 7);
+}
+.lock-list-item-container.just-loaded:nth-of-type(9) {
+    animation-delay: calc(.05s * 8);
+}
+.lock-list-item-container.just-loaded:nth-of-type(10) {
+    animation-delay: calc(.05s * 9);
 }

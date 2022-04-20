@@ -9,6 +9,9 @@
     <li class="nav-item">
         <a class="btn btn-outline-primary" [routerLinkActive]="'active'" [routerLink]="['/lock-list']"><i class="bi bi-card-list me-2"></i>View locks</a>
     </li>
+    <li class="nav-item">
+        <a class="btn btn-outline-primary" [routerLinkActive]="'active'" [routerLink]="['/referral']"><i class="bi bi-card-list me-2"></i>Referral</a>
+    </li>
     <ng-container *ngIf="(testTokens$ | async)!.length">
         <li class="nav-item">
             <a class="btn btn-outline-primary"

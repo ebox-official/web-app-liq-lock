@@ -1,11 +1,38 @@
-.status-icon, .status-text {
-    line-height: 1;
+.main-info {
+    display: grid;
+    gap: .5rem;
 }
 
-.status-icon {
-    font-size: 6rem!important;
+.main-info__withdrawn {
+    margin: 1rem 0;
 }
 
-.status-text {
-    font-size: 3rem!important;
+@media screen and (min-width: 1024px) {
+    .main-info {
+        border: 1px solid #8884;
+        border-radius: 1rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        margin: .75rem 0;
+        padding: 1rem;
+    }
+    
+    .main-info__status {
+        text-align: center;
+    }
+    
+    .status-text {
+        font-size: 1.75rem;
+        line-height: 1;
+    }
+    
+    .main-info__expiration {
+        text-align: right;
+    }
+    
+    .main-info__withdrawn {
+        grid-area: 2/1/2/4;
+        margin: 1.5rem 0 1rem 0;
+        text-align: center;
+    }
 }

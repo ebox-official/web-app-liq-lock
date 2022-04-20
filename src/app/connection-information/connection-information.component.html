@@ -10,8 +10,10 @@
         <li class="list-inline-item">
             <span class="fw-bold">Network</span> {{ connectService.chainId$ | async }}
         </li>
-        <li class="list-inline-item">
-            <span class="fw-bold">Base token</span> {{ connectService.baseTokenBalance$ | async | formatMultiplier }}
+        <li class="align-items-center d-inline-flex gap-1">
+            <span class="fw-bold">Balance</span>
+            {{ connectService.baseTokenBalance$ | async | formatMultiplier }}
+            <img [src]="NETWORK_MAP[this.connectService.chainId$.getValue()].thumb" alt="base token icon">
         </li>
     </ul>
     
