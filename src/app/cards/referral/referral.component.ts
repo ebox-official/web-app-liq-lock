@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ConnectService } from '../connect/connect.service';
+import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 
 @Component({
   selector: 'app-referral',
@@ -9,11 +10,12 @@ import { ConnectService } from '../connect/connect.service';
 })
 export class ReferralComponent implements OnInit {
 
-  url = "https://ebox.io/liq_lock/liq_lock_promo.php";
+  url = "https://ebox.io/liq-lock/liq_lock_promo.php";
   isLoading = false;
   shareLink: string;
 
   constructor(
+	private locationStrategy: LocationStrategy,
     private http: HttpClient,
     private connectService: ConnectService
   ) {}
@@ -28,7 +30,8 @@ export class ReferralComponent implements OnInit {
 
     const { result: giverId } = (await this.http.post(this.url, payload).toPromise() as any);
     
-    this.shareLink = `${document.location.origin}/ref/${giverId}`;
+	var baseHref = this.locationStrategy.getBaseHref();
+    this.shareLink = `${document.location.origin}${baseHref}ref/${giverId}`;
     
     this.isLoading = false;
   }

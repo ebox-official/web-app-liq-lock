@@ -139,7 +139,7 @@ export class CreateLockComponent implements OnInit {
     try {
       this.toasterService.publish(
         ToastColor.warning,
-        "Sending the request for the creation of the lock..."
+        "Creating lock..."
       );
       receipt = await this.liquidityLockerService.lockCreate(
         this.selectedToken,
@@ -148,14 +148,14 @@ export class CreateLockComponent implements OnInit {
       );
     }
     catch (err) {
-      this.toasterService.publish(ToastColor.danger, "Something went wrong.");
+      this.toasterService.publish(ToastColor.danger, "Something went wrong!");
       this.interactingWithSmartContract = false;
       return console.log(err);
     }
 
     this.toasterService.publish(
       ToastColor.success,
-      "The creation of the lock was successful! Navigating to lock details..."
+      "Successfully created lock!"
     );
     this.interactingWithSmartContract = false;
 
@@ -176,18 +176,18 @@ export class CreateLockComponent implements OnInit {
     try {
       this.toasterService.publish(
         ToastColor.warning,
-        "Sending your approve spending request..."
+        "Approving token spending..."
       );
       await this.liquidityLockerService
         .approveUnlimitedSpending(this.selectedToken.address);
     }
     catch (err) {
-      this.toasterService.publish(ToastColor.danger, "Something went wrong.");
+      this.toasterService.publish(ToastColor.danger, "Something went wrong!");
       this.interactingWithSmartContract = false;
       return console.error(err);
     }
 
-    this.toasterService.publish(ToastColor.success, "Successfully approved spending!");
+    this.toasterService.publish(ToastColor.success, "Successfully approved token spending!");
     this.interactingWithSmartContract = false;
 
     // Re-check token allowance

@@ -42,7 +42,7 @@ import { EditLockComponent } from './edit-lock/edit-lock.component';
 import { FindLockComponent } from './cards/lock-list-shell/find-lock/find-lock.component';
 import { CopyableTextComponent } from './copyable-text/copyable-text.component';
 import { ReferralComponent } from './cards/referral/referral.component';
-import { BindComponent } from './cards/bind/bind.component';
+//import { BindComponent } from './cards/bind/bind.component';
 
 @NgModule({
   declarations: [
@@ -84,7 +84,7 @@ import { BindComponent } from './cards/bind/bind.component';
     FindLockComponent,
     CopyableTextComponent,
     ReferralComponent,
-    BindComponent
+//    BindComponent
   ],
   imports: [
     BrowserModule,

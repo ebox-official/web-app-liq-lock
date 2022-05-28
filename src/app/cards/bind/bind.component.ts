@@ -10,7 +10,7 @@ import { ConnectService } from '../connect/connect.service';
 })
 export class BindComponent implements OnInit {
 
-  url = "https://ebox.io/liq_lock/liq_lock_promo.php";
+  url = "https://ebox.io/liq-lock/liq_lock_promo.php";
   isLoading = false;
   giverId: any;
   giverAddress: string;
@@ -35,11 +35,11 @@ export class BindComponent implements OnInit {
 
     const { error, result } = (await this.http.post(this.url, bindTakerToIdPayload).toPromise() as any);
 
-    var getGiverForIdPayload = new FormData();
-    getGiverForIdPayload.append('action', 'get_giver_for_id');
-    getGiverForIdPayload.append('id', this.giverId);
+    var getGiverForAddressPayload = new FormData();
+    getGiverForAddressPayload.append('action', 'get_giver_for_address');
+    getGiverForAddressPayload.append('address', this.connectService.selectedAccount$.getValue());
 
-    const { error: giverAddrErr, result: giverAddr } = (await this.http.post(this.url, getGiverForIdPayload).toPromise() as any);
+    const { error: giverAddrErr, result: giverAddr } = (await this.http.post(this.url, getGiverForAddressPayload).toPromise() as any);
 
     this.isLoading = false;
 

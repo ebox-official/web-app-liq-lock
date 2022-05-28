@@ -1,13 +1,13 @@
 <app-card-archetype>
     <ng-container class="card-header-content">
-        <h5>Create lock</h5>
+        <h4 class="my-1">Create Lock</h4>
     </ng-container>
     <ng-container class="card-body-content">
         <div class="p-3">
 
             <!-- Step 1 -->
             <div class="pb-4">
-                <h4 class="mb-3">Step 1: Select a token</h4>
+                <h5 class="mb-3">Step 1: Select Token</h5>
                 <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home"
@@ -19,7 +19,7 @@
                     </li>
                 </ul>
                 <div class="tab-content mb-3" id="pills-tabContent">
-                    <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                    <div class="tab-pane fade show active mt-4" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
                         
                         <ng-container *ngIf="!(userTokensInitialized$ | async); else tokensLoaded">
                             <div class="text-center">
@@ -29,7 +29,6 @@
                             </div>
                         </ng-container>
                         <ng-template #tokensLoaded>
-                            <small class="text-muted">(Click to select)</small>
                             <ul class="token-list list-group list-group-flush border">
                                 <li class="token-list-item list-group-item position-relative d-flex flex-wrap justify-content-md-between gap-2"
                                     *ngFor="let t of userTokens$ | async;  let odd = odd; trackBy: trackTokenByAddress"
@@ -74,18 +73,18 @@
                                 (click)="loadToken()">Load</button>
                         </div>
                         <div class="invalid-feedback d-block ps-3" *ngIf="tokenAddrField.errors && (tokenAddrField.dirty || tokenAddrField.touched)">
-                            <p *ngIf="tokenAddrField.errors.invalidAddress">Given address is invalid</p>
+                            <p *ngIf="tokenAddrField.errors.invalidAddress">Invalid address</p>
                         </div>
                     </div>
                 </div>
 
                 <ng-container *ngIf="!selectedToken; else showTokenInfo">
-                    <small class="text-muted">Please load a token to proceed.</small>
+                    <small class="text-muted">Please select a token to proceed!</small>
                 </ng-container>
 
                 <ng-template #showTokenInfo>
                     <div class="p-3 border rounded">
-                        <h5>Selected token</h5>
+                        <h5>Selected Token</h5>
                         <div class="d-flex flex-wrap justify-content-md-between gap-2 px-2">
                             <div>
                                 <small class="text-muted">Symbol</small>
@@ -97,7 +96,7 @@
                             </div>
                             <div class="text-md-end">
                                 <small class="text-muted">Balance</small>
-                                <div>{{ selectedToken.balance | weiToDecimal: selectedToken.decimals | formatMultiplier }}</div>
+                                <div>{{ selectedToken.balance | weiToDecimal: selectedToken.decimals | formatMultiplier }} {{ selectedToken.symbol }}</div>
                             </div>
                         </div>
                     </div>
@@ -107,7 +106,7 @@
 
             <!-- Step 2 -->
             <div *ngIf="selectedToken" class="pb-4">
-                <h4 class="mb-3">Step 2: Insert the amount</h4>
+                <h5 class="mb-3">Step 2: Choose Amount to Lock</h5>
                 <div class="input-group mb-2">
                     <input [formControl]="amountField"
                         [ngClass]="{
@@ -117,8 +116,8 @@
                         [readonly]="interactingWithSmartContract"
                         type="text"
                         class="form-control"
-                        placeholder="Amount"
-                        aria-label="Amount"
+                        placeholder="Token amount to lock"
+                        aria-label="Token amount to lock"
                         aria-describedby="button-addon">
                     <button class="btn btn-primary"
                         type="button"
@@ -140,16 +139,16 @@
                         (click)="setPercentageAmount(1)">Max</button>
                 </div>
                 <div class="invalid-feedback d-block ps-3" *ngIf="amountField.errors && (amountField.dirty || amountField.touched)">
-                    <p *ngIf="amountField.errors.invalidAmount">Amount is invalid</p>
-                    <p *ngIf="amountField.errors.amountTooLow">Amount is too low</p>
-                    <p *ngIf="amountField.errors.amountTooHigh">Amount is too high</p>
+                    <p *ngIf="amountField.errors.invalidAmount">Invalid amount</p>
+                    <p *ngIf="amountField.errors.amountTooLow">Amount too low</p>
+                    <p *ngIf="amountField.errors.amountTooHigh">Amount too high</p>
                 </div>
                 <div class="scroll-step" id="step-2-end"></div>
             </div>
 
             <!-- Step 3 -->
             <div *ngIf="selectedToken && amountConfirmed" class="pb-4">
-                <h4 class="mb-3">Step 3: Select unlock date</h4>
+                <h5 class="mb-3">Step 3: Select Unlocking Time</h5>
                 <div class="input-group mb-2">
                     <input [formControl]="unlockDateField"
                         [ngClass]="{
@@ -161,8 +160,8 @@
                         [readonly]="interactingWithSmartContract"
                         type="datetime-local"
                         class="form-control"
-                        placeholder="Unlock date"
-                        aria-label="Unlock date"
+                        placeholder="Unlocking time"
+                        aria-label="Unlocking time"
                         aria-describedby="button-addon">
                     <button class="btn btn-primary"
                         type="button"
@@ -170,24 +169,24 @@
                         (click)="confirmUnlockDate()">Next</button>
                 </div>
                 <div class="invalid-feedback d-block ps-3" *ngIf="unlockDateField.errors && (unlockDateField.dirty || unlockDateField.touched)">
-                    <p *ngIf="unlockDateField.errors.required">Unlock date is required</p>
-                    <p *ngIf="unlockDateField.errors.tooFarBack">Unlock date can't be in the past</p>
-                    <p *ngIf="unlockDateField.errors.tooFarAhead">Unlock date can't be after {{ maxDate }}</p>
+                    <p *ngIf="unlockDateField.errors.required">Unlocking time is required</p>
+                    <p *ngIf="unlockDateField.errors.tooFarBack">Unlocking time can't be in the past</p>
+                    <p *ngIf="unlockDateField.errors.tooFarAhead">Unlocking time can't be after {{ maxDate }}</p>
                 </div>
                 <div class="scroll-step" id="step-3-end"></div>
             </div>
 
             <!-- Step 4 -->
             <div *ngIf="selectedToken && amountConfirmed && unlockDateConfirmed" class="pb-4">
-                <h4 class="mb-3">Step 4: Review and create</h4>
+                <h5 class="mb-3">Step 4: Review &amp; Create</h5>
                 <div class="alert alert-danger" role="alert">
-                    Be extremely sure that amount and unlock date are correct.<br>Nobody, not even ebox, will be able to revert the unlock until the unlock date!
+                    Be absolutely sure to set the correct token amount and unlocking time!<br>It is technically impossible to revert the lock once it has been set up.
                 </div>
                 <div class="p-3 border rounded mb-3">
                     <div class="d-grid gap-3">
                         <div>
-                            <h5>Selected token</h5>
-                            <div class="d-flex flex-wrap justify-content-md-between gap-2 px-2">
+                            <h5>Selected Token</h5>
+                            <div class="d-flex flex-wrap justify-content-md-between gap-2">
                                 <div>
                                     <small class="text-muted">Symbol</small>
                                     <div>{{ selectedToken.symbol }}</div>
@@ -198,13 +197,13 @@
                                 </div>
                                 <div class="text-md-end">
                                     <small class="text-muted">Balance</small>
-                                    <div>{{ selectedToken.balance | weiToDecimal: selectedToken.decimals | formatMultiplier }}</div>
+                                    <div>{{ selectedToken.balance | weiToDecimal: selectedToken.decimals | formatMultiplier }} {{ selectedToken.symbol }}</div>
                                 </div>
                             </div>
                         </div>
                         <div>
-                            <h5>Amount</h5>
-                            <div *ngIf="!amountField.errors">{{ amountField.value }}</div>
+                            <h5>Amount to Lock</h5>
+                            <div *ngIf="!amountField.errors">{{ amountField.value }} {{ selectedToken.symbol }}</div>
                             <div class="invalid-feedback d-block" *ngIf="amountField.errors">
                                 <p *ngIf="amountField.errors.invalidAmount">Amount is invalid</p>
                                 <p *ngIf="amountField.errors.amountTooLow">Amount is too low</p>
@@ -212,7 +211,7 @@
                             </div>
                         </div>
                         <div>
-                            <h5>Unlock date</h5>
+                            <h5>Unlocking Time</h5>
                             <div *ngIf="!unlockDateField.errors">{{ date2timestamp(unlockDateField.value) | formatDate}}</div>
                             <div class="invalid-feedback d-block" *ngIf="unlockDateField.errors">
                                 <p *ngIf="unlockDateField.errors.required">Unlock date is required</p>

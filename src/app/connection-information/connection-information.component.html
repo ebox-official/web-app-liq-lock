@@ -7,13 +7,11 @@
         <li class="list-inline-item">
             <span class="fw-bold">Address</span> {{ connectService.selectedAccount$ | async | ellipsis: 10 }}
         </li>
-        <li class="list-inline-item">
-            <span class="fw-bold">Network</span> {{ connectService.chainId$ | async }}
+        <li class="list-inline-item px-2">
+			<span class="fw-bold">Network</span> {{ NETWORK_MAP[this.connectService.chainId$.getValue()].name }}
         </li>
-        <li class="align-items-center d-inline-flex gap-1">
-            <span class="fw-bold">Balance</span>
-            {{ connectService.baseTokenBalance$ | async | formatMultiplier }}
-            <img [src]="NETWORK_MAP[this.connectService.chainId$.getValue()].thumb" alt="base token icon">
+        <li class="list-inline-item">
+            <span class="fw-bold">Balance</span> {{ connectService.baseTokenBalance$ | async | formatMultiplier }} {{ NETWORK_MAP[this.connectService.chainId$.getValue()].currencyName }}
         </li>
     </ul>
     

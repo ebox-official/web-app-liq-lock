@@ -1,6 +1,6 @@
 <div class="p-3">
-    <h4 class="card-title">Find lock by index</h4>
-    <p class="card-text">This is an helper page that let's you find a lock by providing its index <span class="mx-1" appBsTip data-bs-toggle="tooltip" title="The index is a sequential number that coincide with a create event in the blockchain and it's a unique identifier for each lock."><i class="bi bi-info-circle"></i></span>.</p>
+    <h4 class="card-title">Find Lock by ID</h4>
+    <p class="card-text">Each ebox Liquidity Locker instance ("lock") is assigned a unique ID. You can use this ID to quickly retrieve data about any lock that was ever created.</p>
     <form class="col-md-6 needs-validation novalidate"
           [formGroup]="findLockForm"
           (ngSubmit)="onSubmit()">
@@ -12,15 +12,15 @@
                    }"
                    type="text"
                    class="form-control"
-                   placeholder="Insert lock index">
+                   placeholder="Lock ID">
             <button class="btn btn-outline-primary"
                     type="submit"
                     [disabled]="lockIndex.errors ? 'disabled' : null">Go</button>
         </div>
         <div class="d-block invalid-feedback ms-2"
             *ngIf="lockIndex.errors && (lockIndex.dirty || lockIndex.touched)">
-            <div *ngIf="lockIndex.errors.required">Lock index is required.</div>
-            <div *ngIf="lockIndex.errors.pattern">Lock index has to be an integer number.</div>
+            <div *ngIf="lockIndex.errors.required">Lock ID is required.</div>
+            <div *ngIf="lockIndex.errors.pattern">Lock ID has to be an integer number.</div>
         </div>
     </form>
 </div>

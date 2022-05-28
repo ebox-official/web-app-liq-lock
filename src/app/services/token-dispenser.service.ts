@@ -52,9 +52,13 @@ export class TokenDispenserService {
   }
 
   async giveTestToken(index: number) {
+	let value = 0;
+	if(index == 3)
+		value = 5000;
+
     const tx = await this.tokenDispenserContract.giveToken(
       index,
-      this.connectService.decimalToWei("100", 18)
+      this.connectService.decimalToWei(value.toString(), 18)
     );
     return await tx.wait();
   }

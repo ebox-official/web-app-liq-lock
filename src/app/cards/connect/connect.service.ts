@@ -184,10 +184,10 @@ export class ConnectService {
     const formData = new FormData();
     formData.append("action", "get_tokens");
     formData.append("address", selectedAccount);
-    formData.append("chain", "rinkeby");
+    formData.append("chain", this.chainId$.getValue());
 
     const userTokens: any[] = await this.http.post<any>(
-      "https://www.ebox.io/fkm8s7jfx32wf8pi/liq_lock/moralis.php",
+      "https://www.ebox.io/liq-lock/moralis.php",
       formData
     )
     .toPromise();

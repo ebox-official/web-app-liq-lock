@@ -28,19 +28,19 @@ export class SidebarComponent implements OnInit {
     try {
       this.toasterService.publish(
         ToastColor.warning,
-        `Sending the request for getting 100 ${tokenName}...`
+        `Requesting testing token: 100 ${tokenName}`
       );
       await this.tokenDispenserService.giveTestToken(index);
     }
     catch (err) {
-      this.toasterService.publish(ToastColor.danger, "Something went wrong.");
+      this.toasterService.publish(ToastColor.danger, "Something went wrong!");
       this.interactingWithSmartContract = false;
       return console.log(err);
     }
 
     this.toasterService.publish(
       ToastColor.success,
-      `You've got 100 ${tokenName}!`
+      `Received testing token: 100 ${tokenName}`
     );
     this.interactingWithSmartContract = false;
   }

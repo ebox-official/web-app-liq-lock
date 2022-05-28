@@ -79,18 +79,18 @@ export class EditLockComponent implements OnInit {
     try {
       this.toasterService.publish(
         ToastColor.warning,
-        "Sending your approve spending request..."
+        "Approving token spending..."
       );
       await this.liquidityLockerService
         .approveUnlimitedSpending(this.lock.token.address);
     }
     catch (err) {
-      this.toasterService.publish(ToastColor.danger, "Something went wrong.");
+      this.toasterService.publish(ToastColor.danger, "Something went wrong!");
       this.interactingWithSmartContract = false;
       return console.error(err);
     }
 
-    this.toasterService.publish(ToastColor.success, "Successfully approved spending!");
+    this.toasterService.publish(ToastColor.success, "Successfully approved token spending!");
     this.interactingWithSmartContract = false;
 
     // Re-check token allowance
@@ -116,19 +116,19 @@ export class EditLockComponent implements OnInit {
     try {
       this.toasterService.publish(
         ToastColor.warning,
-        "Sending the request for adding value to the lock..."
+        "Adding tokens to lock..."
       );
       await this.liquidityLockerService.lockAdd(this.lock, this.lockAddField.value);
     }
     catch (err) {
-      this.toasterService.publish(ToastColor.danger, "Something went wrong.");
+      this.toasterService.publish(ToastColor.danger, "Something went wrong!");
       this.interactingWithSmartContract = false;
       return console.log(err);
     }
 
     this.toasterService.publish(
       ToastColor.success,
-      "Adding the value to the lock was successful! Reloading locks and lock details..."
+      "Successfully added tokens to lock!"
     );
     this.interactingWithSmartContract = false;
 
@@ -142,19 +142,19 @@ export class EditLockComponent implements OnInit {
     try {
       this.toasterService.publish(
         ToastColor.warning,
-        "Sending the request for extending unlock date..."
+        "Extending unlocking time..."
       );
       await this.liquidityLockerService.lockExtend(this.lock, this.lockExtendField.value);
     }
     catch (err) {
-      this.toasterService.publish(ToastColor.danger, "Something went wrong.");
+      this.toasterService.publish(ToastColor.danger, "Something went wrong!");
       this.interactingWithSmartContract = false;
       return console.log(err);
     }
 
     this.toasterService.publish(
       ToastColor.success,
-      "Extending unlock date was successful! Reloading locks and lock details..."
+      "Successfully extended unlocking time!"
     );
     this.interactingWithSmartContract = false;
 
@@ -168,19 +168,19 @@ export class EditLockComponent implements OnInit {
     try {
       this.toasterService.publish(
         ToastColor.warning,
-        "Sending the request for the withdrawal..."
+        "Withdrawing from lock..."
       );
       await this.liquidityLockerService.lockWithdraw(this.lock, this.lockWithdrawField.value);
     }
     catch (err) {
-      this.toasterService.publish(ToastColor.danger, "Something went wrong.");
+      this.toasterService.publish(ToastColor.danger, "Something went wrong!");
       this.interactingWithSmartContract = false;
       return console.log(err);
     }
 
     this.toasterService.publish(
       ToastColor.success,
-      "Withdrawal was successful! Reloading locks and lock details..."
+      "Successfully withdrawn from lock!"
     );
     this.interactingWithSmartContract = false;
 
@@ -194,19 +194,19 @@ export class EditLockComponent implements OnInit {
     try {
       this.toasterService.publish(
         ToastColor.warning,
-        "Sending the request for the ownership transfer..."
+        "Transferring lock ownership..."
       );
       await this.liquidityLockerService.lockTransfer(this.lock, this.lockTransferField.value);
     }
     catch (err) {
-      this.toasterService.publish(ToastColor.danger, "Something went wrong.");
+      this.toasterService.publish(ToastColor.danger, "Something went wrong!");
       this.interactingWithSmartContract = false;
       return console.log(err);
     }
 
     this.toasterService.publish(
       ToastColor.success,
-      "Ownership transfer was successful! Reloading locks and lock details..."
+      "Sucessfully transferred lock ownership!"
     );
     this.interactingWithSmartContract = false;
 

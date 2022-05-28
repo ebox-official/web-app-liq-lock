@@ -2,22 +2,23 @@
 <div class="container-fluid p-0 h-100 d-md-none">
     <div class="row g-0 text-center">
         <div class="col-4">
-            <a class="nav-link" [routerLinkActive]="'active'" [routerLink]="['/home']">Home</a>
+            <a class="nav-link" [routerLinkActive]="'active'" [routerLink]="['/home']">Start</a>
         </div>
         <div class="col-4">
-            <a class="nav-link" [routerLinkActive]="'active'" [routerLink]="['/create-lock']">Create lock</a>
+            <a class="nav-link" [routerLinkActive]="'active'" [routerLink]="['/create-lock']">Create Lock</a>
         </div>
         <div class="col-4">
             <div class="dropdown">
                 <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Other</a>
                 <ul class="dropdown-menu py-3">
-                    <li><a class="dropdown-item" [routerLinkActive]="'active'" [routerLink]="['/lock-list']">View locks</a></li>
+                    <li><a class="dropdown-item" [routerLinkActive]="'active'" [routerLink]="['/lock-list']">View Locks</a></li>
+					<li><a class="dropdown-item" [routerLinkActive]="'active'" [routerLink]="['/referral']">Referral Program</a></li>
                     <ng-container *ngIf="(testTokens$ | async)!.length">
                         <li><a class="dropdown-item"
                             (click)="giveTestToken('Uni-LP', 0)">Get 100 Uni-LP</a>
                         </li>
                         <li><a class="dropdown-item"
-                            (click)="giveTestToken('EBOX', 3)">Get 100 EBOX</a>
+                            (click)="giveTestToken('EBOX', 3)">Get 5,000 EBOX</a>
                         </li>
                     </ng-container>
                 </ul>

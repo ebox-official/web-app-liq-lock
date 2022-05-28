@@ -12,7 +12,7 @@ Run `ng generate component component-name` to generate a new component. You can 
 
 ## Build
 
-Run `ng build --output-path app --base-href /app/`. The build artifacts will be stored in the `app/`. Use the `--prod` flag for a production build.
+Run `ng build --output-path app --base-href /liq-lock/`. The build artifacts will be stored in the `app/`. Use the `--prod` flag for a production build.
 
 If you want to compile for GH pages run `ng build --output-path docs --base-href /[[ REPO NAME ]]/`, for development `--configuration development`. Then go in the `docs/`, make a copy of index.html are rename it into 404.html.
 

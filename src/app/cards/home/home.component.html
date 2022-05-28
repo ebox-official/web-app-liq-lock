@@ -1,82 +1,37 @@
 <app-card-archetype>
-    <ng-container class="card-header-content">Homepage</ng-container>
+    <ng-container class="card-header-content">
+		<h4 class="my-1">ebox Liquidity Locker</h4>
+	</ng-container>
     <ng-container class="card-body-content">
         <div class="p-3">
-            <h4 class="card-title">Welcome to the ebox Liquidity Locker!</h4>
-            <p class="card-text">Lock your tokens (normal ones or liquidity pool tokens) for a certain amount of time! <br> Doesn't sound amazing but it really is, read below why.</p>
+            <p class="card-text mb-4">
+				Gain your community's trust by safely lock your LP tokens acquired through providing liquidity – Essential functionality, low fees, no hidden costs (see <a href="https://ebox-official.medium.com/ebox-liquidity-locker-b07ce31f9735" target="_blank">Medium</a> for details).
+			</p>
 
-            <div class="mb-4">
-                <h5>Frequently Asked Questions</h5>
-                <div class="accordion" id="accordion-1">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingOne">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
-                                aria-expanded="false" aria-controls="collapseOne">
-                                What is token locking?
-                            </button>
-                        </h2>
-                        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
-                            data-bs-parent="#accordion-1">
-                            <div class="accordion-body">
-                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus ad veniam veritatis quo ratione magni quam odio molestiae dolorem deleniti soluta saepe a, voluptatum quidem quasi ducimus quia aut accusantium!
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingTwo">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                Why it's so important?
-                            </button>
-                        </h2>
-                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
-                            data-bs-parent="#accordion-1">
-                            <div class="accordion-body">
-                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem omnis quibusdam similique tenetur temporibus veniam recusandae adipisci illo minus voluptatem. Id quo accusantium veniam, facere voluptas cum tempore et eveniet.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingThree">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                How this dapp locks your tokens?
-                            </button>
-                        </h2>
-                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
-                            data-bs-parent="#accordion-1">
-                            <div class="accordion-body">
-                                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ex delectus consectetur officia odio repudiandae. Eligendi dignissimos, reiciendis mollitia optio repellat quo neque voluptate, esse nisi est perferendis tenetur beatae illum!
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mb-4">
-                <h5>What can you do?</h5>
+			<div class="mb-4">
                 <div class="d-inline-flex flex-wrap gap-2 list-of-actions">
-                    <a [routerLink]="['/create-lock']" class="btn btn-primary"><i class="bi bi-lock-fill me-2"></i>Create lock</a>
-                    <a [routerLink]="['/lock-list/find']" class="btn btn-primary"><i class="bi bi-card-list me-2"></i>Find a lock</a>
-                    <a [routerLink]="['/lock-list/personal']" class="btn btn-primary"><i class="bi bi-card-list me-2"></i>View your locks</a>
-                    <a [routerLink]="['/lock-list/general']" class="btn btn-primary"><i class="bi bi-card-list me-2"></i>View all locks</a>
+                    <a [routerLink]="['/create-lock']" class="btn btn-primary"><i class="bi bi-lock-fill me-2"></i>Create Lock</a>
+                    <a [routerLink]="['/lock-list/personal']" class="btn btn-primary"><i class="bi bi-card-list me-2"></i>View Your Locks</a>
+                    <a [routerLink]="['/lock-list/general']" class="btn btn-primary"><i class="bi bi-card-list me-2"></i>View All Locks</a>
+					<a [routerLink]="['/lock-list/find']" class="btn btn-primary"><i class="bi bi-card-list me-2"></i>Find Lock by ID</a>
                 </div>
             </div>
 
             <div class="mb-4">
-                <h5>Available features</h5>
+                <h5>Features</h5>
+				<div class="pb-1"></div>
                 <div class="accordion" id="accordion-2">
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="accordion-2-heading-1">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#accordion-2-collapse-1"
                                 aria-expanded="false" aria-controls="accordion-2-collapse-1">
-                                Add value to the locked amount
+                                Create Locks
                             </button>
                         </h2>
                         <div id="accordion-2-collapse-1" class="accordion-collapse collapse" aria-labelledby="accordion-2-heading-1"
                             data-bs-parent="#accordion-2">
                             <div class="accordion-body">
-                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus ad veniam veritatis quo ratione magni quam odio molestiae dolorem deleniti soluta saepe a, voluptatum quidem quasi ducimus quia aut accusantium!
+                                Any ERC-20 token can be stored away inside the ebox Liquidity Locker. After selecting a token and setting the desired locking amount and unlocking time, your tokens are safely deposited inside an unbreakable smart contract.
                             </div>
                         </div>
                     </div>
@@ -84,13 +39,13 @@
                         <h2 class="accordion-header" id="accordion-2-heading-2">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                 data-bs-target="#accordion-2-collapse-2" aria-expanded="false" aria-controls="accordion-2-collapse-2">
-                                Extend the locking period
+                                View Locks
                             </button>
                         </h2>
                         <div id="accordion-2-collapse-2" class="accordion-collapse collapse" aria-labelledby="accordion-2-heading-2"
                             data-bs-parent="#accordion-2">
                             <div class="accordion-body">
-                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem omnis quibusdam similique tenetur temporibus veniam recusandae adipisci illo minus voluptatem. Id quo accusantium veniam, facere voluptas cum tempore et eveniet.
+                                Locks that have been created through this app are always visible to the public. Each lock is assigned a unique ID number and a link, through which it can easily be accessed &amp; shared.
                             </div>
                         </div>
                     </div>
@@ -98,13 +53,15 @@
                         <h2 class="accordion-header" id="accordion-2-heading-3">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                 data-bs-target="#accordion-2-collapse-3" aria-expanded="false" aria-controls="#accordion-2-collapse-3">
-                                Transfer ownership of the lock
+                                Manage Locks
                             </button>
                         </h2>
                         <div id="accordion-2-collapse-3" class="accordion-collapse collapse" aria-labelledby="accordion-2-heading-3"
                             data-bs-parent="#accordion-2">
                             <div class="accordion-body">
-                                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ex delectus consectetur officia odio repudiandae. Eligendi dignissimos, reiciendis mollitia optio repellat quo neque voluptate, esse nisi est perferendis tenetur beatae illum!
+                                After creating a lock, more tokens of the same kind can be added. The lock ownership may be transferred to another address, and the lock duration can be extended beyond what was set initially.
+								<div class="mb-1"></div>
+								Once the unlocking time has been reached, tokens can be withdrawn from the lock, either entirely or partially.
                             </div>
                         </div>
                     </div>
@@ -112,13 +69,58 @@
                         <h2 class="accordion-header" id="accordion-2-heading-4">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                 data-bs-target="#accordion-2-collapse-4" aria-expanded="false" aria-controls="#accordion-2-collapse-4">
-                                Withdraw, even partially, the lock amount
+                                Referral Program
                             </button>
                         </h2>
                         <div id="accordion-2-collapse-4" class="accordion-collapse collapse" aria-labelledby="accordion-2-heading-4"
                             data-bs-parent="#accordion-2">
                             <div class="accordion-body">
-                                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ex delectus consectetur officia odio repudiandae. Eligendi dignissimos, reiciendis mollitia optio repellat quo neque voluptate, esse nisi est perferendis tenetur beatae illum!
+                                Spread the word, get rewards – To make sure that all the project administrators in need hear the news of the ebox Liquidity Locker, we're holding off a <a [routerLink]="['/referral']">promotion campaign</a>.
+								<div class="mb-1"></div>
+								<b>For every lock that a person referred by you creates, you receive 50% of the fee they paid!</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+				<h5>Frequently Asked Questions</h5>
+				<div class="pb-1"></div>
+                <div class="accordion" id="accordion-1">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
+                                aria-expanded="false" aria-controls="collapseOne">
+                                What is token locking and why does it matter?
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
+                            data-bs-parent="#accordion-1">
+                            <div class="accordion-body">
+                                Looking at the process of providing decentralized exchange (DEX) liquidity, the significance of token locking quickly becomes evident:
+								<div class="mt-1"></div>
+								Whenever liquidity for any token pair is provided on a DEX such as Uniswap or PancakeSwap, the providing person receives so-called &quot;LP tokens&quot;. These are regular ERC-20 tokens with a special purpose: LP tokens represent a share of DEX liquidity, meaning that whoever holds them can remove liquidity from the exchange at any time.
+								<div class="mt-1"></div>
+								This poses a major safety issue. When a project's entire liquidity is withdrawn malevolently, a &quot;rug pull&quot; happens, leaving investors with worthless tokens, essentially stealing people's money.
+								<div class="mt-1"></div>
+								<b>By locking LP tokens inside a smart contract, rug pulling becomes impossible. Until the unlocking time has been reached, the locked LP tokens cannot be retrieved (and used to remove liquidity).</b>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                How does it work?
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
+                            data-bs-parent="#accordion-1">
+                            <div class="accordion-body">
+                                Tokens are deposited inside an immutable smart contract, which only allows for retrieval by the depositing address once the set unlocking time has been reached.<br>
+								<div class="mt-1"></div>
+								Functional integrity is guaranteed through open-source code and specialist auditing by CertiK Foundation. Data on every lock created through the ebox Liquidity Locker is publicly accessible through this dashboard.
                             </div>
                         </div>
                     </div>

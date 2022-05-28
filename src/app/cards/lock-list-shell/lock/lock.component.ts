@@ -28,7 +28,7 @@ export class LockComponent implements OnInit {
     
     // Get the index from the URL, load the resource statelessly in ngOnInit
     const lockIndexParam = this.route.snapshot.paramMap.get("index");
-    if (!lockIndexParam) throw new Error("Could not get lock index.");
+    if (!lockIndexParam) throw new Error("Could not get lock ID.");
     this.lockIndex = parseInt(lockIndexParam);
 
     this.shareLink = `${document.location.origin}/lock-list/find/${this.lockIndex}`;

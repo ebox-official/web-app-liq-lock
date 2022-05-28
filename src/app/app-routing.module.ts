@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { BindComponent } from './cards/bind/bind.component';
+//import { BindComponent } from './cards/bind/bind.component';
 import { ConnectComponent } from './cards/connect/connect.component';
 import { CreateLockComponent } from './cards/create-lock/create-lock.component';
 import { HomeComponent } from './cards/home/home.component';
@@ -22,18 +22,20 @@ const routes: Routes = [
     component: LockListShellComponent,
     canActivate: [ConnectGuard],
     children: [
-      { path: "", redirectTo: "find", pathMatch: "full"},
+      { path: "", redirectTo: "personal", pathMatch: "full"},
       { path: "find", component: FindLockComponent },
       { path: "personal", component: LockListComponent, data: { viewMode: "personal" } },
       { path: "general", component: LockListComponent, data: { viewMode: "general" } }
     ]
   },
-  { path: "lock-list/find/:index", component: LockComponent, canActivate: [ConnectGuard] },
   { path: "lock-list/personal/:index", component: LockComponent, canActivate: [ConnectGuard] },
   { path: "lock-list/general/:index", component: LockComponent, canActivate: [ConnectGuard] },
+  { path: "lock-list/find/:index", component: LockComponent, canActivate: [ConnectGuard] },
   { path: "create-lock", component: CreateLockComponent, canActivate: [ConnectGuard] },
   { path: "referral", component: ReferralComponent, canActivate: [ConnectGuard] },
-  { path: "ref/:id", component: BindComponent, canActivate: [ConnectGuard] },
+//  { path: "ref/:id", component: BindComponent, canActivate: [ConnectGuard] },
+  { path: "ref/:id", component: HomeComponent, canActivate: [ConnectGuard] },
+  { path: "ref", redirectTo: "referral", pathMatch: "full" },
   { path: "**", component: NotFoundComponent }
 ];
 

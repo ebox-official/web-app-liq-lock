@@ -1,10 +1,10 @@
 <app-card-archetype>
     <ng-container class="card-header-content">
         <div class="mb-3">
-            <h5 class="mb-2">Lock list</h5>
+            <h4 class="my-1">View Locks</h4>
 
             <div *ngIf="progressBarShown">
-                <small class="text-muted">Rendering the full list may take a while, as the list is fetched directly from the blockchain.</small>
+                <small class="text-muted">Displaying the full list may take a while, as it is fetched live from the blockchain.</small>
                 <div class="progress"
                      style="transition: max-height .6s ease;"
                      [style.max-height]="(!(locksInitialized$ | async) ? 50 : 0)+ 'px'">
@@ -24,13 +24,13 @@
         </div>
         <ul class="nav nav-tabs" style="margin-bottom: calc(-0.5rem - 1px)">
             <li class="nav-item">
-                <a class="nav-link" [routerLinkActive]="'active'" [routerLink]="['./find']">Find</a>
+                <a class="nav-link" [routerLinkActive]="'active'" [routerLink]="['./personal']">Your Locks</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" [routerLinkActive]="'active'" [routerLink]="['./personal']">Personal</a>
+                <a class="nav-link" [routerLinkActive]="'active'" [routerLink]="['./general']">All Locks</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" [routerLinkActive]="'active'" [routerLink]="['./general']">Everybody</a>
+			<li class="nav-item">
+                <a class="nav-link" [routerLinkActive]="'active'" [routerLink]="['./find']">Find Lock by ID</a>
             </li>
         </ul>
     </ng-container>

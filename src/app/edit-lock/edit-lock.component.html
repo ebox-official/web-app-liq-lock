@@ -1,7 +1,6 @@
 <div class="p-3 my-4 border rounded">
-    <h4 class="mb-3">Functionalities</h4>
 
-    <ng-container *ngIf="hasToApprove; else functionalitiesGrid">
+	<ng-container *ngIf="hasToApprove; else functionalitiesGrid">
         <div class="alert alert-dark" role="alert">
             In order to access these functionalities you need to grant allowance to our smart contract first. To proceed click on Approve.
         </div>
@@ -12,14 +11,14 @@
     </ng-container>
     <ng-template #functionalitiesGrid>
 
-        <div class="alert alert-danger" role="alert">
-            Be extremely sure that amount and unlock date are correct.<br>Nobody, not even ebox, will be able to revert the unlock until the unlock date!
+        <div class="alert alert-danger mb-4" role="alert">
+            Be absolutely sure to set the correct token amount and unlocking time!<br>It is technically impossible to revert the lock once it has been set up.
         </div>
         
         <div class="functionalities-grid">
             <div>
-                <div class="fs-5 lh-0">Add to lock</div>
-                <p class="mb-2"><small class="text-muted">Add value to the locked amount</small></p>
+                <div class="fs-5 lh-0">Add</div>
+                <p class="mb-2"><small class="text-muted">Add tokens of the same kind</small></p>
                 <div class="input-group mb-2">
                     <input [formControl]="lockAddField"
                         [ngClass]="{
@@ -29,21 +28,21 @@
                         [attr.disabled]="(interactingWithSmartContract) ? '' : null"
                         type="text"
                         class="form-control"
-                        placeholder="Value to add"
-                        aria-label="Value to add"
+                        placeholder="Token amount to add"
+                        aria-label="Token amount to add"
                         aria-describedby="button-addon">
                     <button class="btn btn-primary"
                         [class.disabled]="lockAddField.invalid || interactingWithSmartContract"
                         (click)="lockAdd()">Add</button>
                 </div>
                 <div class="invalid-feedback d-block ps-3" *ngIf="lockAddField.errors && (lockAddField.dirty || lockAddField.touched)">
-                    <p *ngIf="lockAddField.errors.invalidAmount">Add amount is invalid</p>
-                    <p *ngIf="lockAddField.errors.amountTooLow">Add amount is too low</p>
-                    <p *ngIf="lockAddField.errors.amountTooHigh">Add amount is too high</p>
+                    <p *ngIf="lockAddField.errors.invalidAmount">Invalid amount</p>
+                    <p *ngIf="lockAddField.errors.amountTooLow">Amount too low</p>
+                    <p *ngIf="lockAddField.errors.amountTooHigh">Amount too high</p>
                 </div>
             </div>
             <div>
-                <div class="fs-5 lh-0">Extend unlock date</div>
+                <div class="fs-5 lh-0">Extend</div>
                 <p class="mb-2"><small class="text-muted">Extend the locking period</small></p>
                 <div class="input-group mb-2">
                     <input [formControl]="lockExtendField"
@@ -56,22 +55,22 @@
                         [attr.disabled]="(interactingWithSmartContract) ? '' : null"
                         type="datetime-local"
                         class="form-control"
-                        placeholder="New unlock date"
-                        aria-label="New unlock date"
+                        placeholder="New unlocking time"
+                        aria-label="New unlocking time"
                         aria-describedby="button-addon">
                     <button class="btn btn-primary"
                         [class.disabled]="lockExtendField.invalid || interactingWithSmartContract"
                         (click)="lockExtend()">Extend</button>
                 </div>
                 <div class="invalid-feedback d-block ps-3" *ngIf="lockExtendField.errors && (lockExtendField.dirty || lockExtendField.touched)">
-                    <p *ngIf="lockExtendField.errors.required">New unlock date is required</p>
-                    <p *ngIf="lockExtendField.errors.tooFarBack">New unlock date can't be before current unlock date</p>
-                    <p *ngIf="lockExtendField.errors.tooFarAhead">Unlock date can't be after {{ maxDate }}</p>
+                    <p *ngIf="lockExtendField.errors.required">New unlocking time is required</p>
+                    <p *ngIf="lockExtendField.errors.tooFarBack">New unlocking time can't be before current unlock date</p>
+                    <p *ngIf="lockExtendField.errors.tooFarAhead">New unlocking time can't be after {{ maxDate }}</p>
                 </div>
             </div>
             <div>
-                <div class="fs-5 lh-0">Transfer ownership</div>
-                <p class="mb-2"><small class="text-muted">Transfer ownership of the lock</small></p>
+                <div class="fs-5 lh-0">Transfer</div>
+                <p class="mb-2"><small class="text-muted">Transfer lock ownership</small></p>
                 <div class="input-group">
                     <input [formControl]="lockTransferField" 
                         [ngClass]="{
@@ -81,8 +80,8 @@
                         [attr.disabled]="(interactingWithSmartContract) ? '' : null"
                         type="text"
                         class="form-control"
-                        placeholder="New owner"
-                        aria-label="New owner"
+                        placeholder="New owner address"
+                        aria-label="New owner address"
                         aria-describedby="button-addon">
                     <button class="btn btn-primary"
                         type="button"
@@ -91,12 +90,12 @@
                         (click)="lockTransfer()">Transfer</button>
                 </div>
                 <div class="invalid-feedback d-block ps-3" *ngIf="lockTransferField.errors && (lockTransferField.dirty || lockTransferField.touched)">
-                    <p *ngIf="lockTransferField.errors.invalidAddress">Given address is invalid</p>
+                    <p *ngIf="lockTransferField.errors.invalidAddress">Invalid address</p>
                 </div>
             </div>
             <div>
                 <div class="fs-5 lh-0">Withdraw</div>
-                <p class="mb-2"><small class="text-muted">Withdraw, even partially, the lock amount</small></p>
+                <p class="mb-2"><small class="text-muted">Withdraw all or some tokens from lock</small></p>
                 <div class="input-group mb-2">
                     <input [formControl]="lockWithdrawField"
                         [ngClass]="{
@@ -106,8 +105,8 @@
                         [attr.disabled]="(lock.isLocked() || interactingWithSmartContract) ? '' : null"
                         type="text"
                         class="form-control"
-                        placeholder="Value to take"
-                        aria-label="Value to take"
+                        placeholder="Token amount to withdraw"
+                        aria-label="Token amount to withdraw"
                         aria-describedby="button-addon">
                     <button class="btn btn-primary"
                         [class.disabled]="lock.isLocked() || lockWithdrawField.invalid || interactingWithSmartContract"
@@ -128,9 +127,9 @@
                         [class.disabled]="lock.isLocked()  || interactingWithSmartContract">Max</button>
                 </div>
                 <div class="invalid-feedback d-block ps-3" *ngIf="lockWithdrawField.errors && (lockWithdrawField.dirty || lockWithdrawField.touched)">
-                    <p *ngIf="lockWithdrawField.errors.invalidAmount">Withdraw amount is invalid</p>
-                    <p *ngIf="lockWithdrawField.errors.amountTooLow">Withdraw amount is too low</p>
-                    <p *ngIf="lockWithdrawField.errors.amountTooHigh">Withdraw amount is too high</p>
+                    <p *ngIf="lockWithdrawField.errors.invalidAmount">Invalid amount</p>
+                    <p *ngIf="lockWithdrawField.errors.amountTooLow">Amount too low</p>
+                    <p *ngIf="lockWithdrawField.errors.amountTooHigh">Amount too high</p>
                 </div>
             </div>
         </div>
