@@ -2,15 +2,20 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.8.
 
-## Development server
+## Package manager and installation
+
+This project uses yarn (NOT npm), so install it with `yarn` command.
+Don't mix the two while installing dependencies or you will end up losing certain packages.
+
+## Launch locally
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
-## Code scaffolding
+## Make a component
 
 Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
 
-## Build
+## Compile
 
 Run `ng build --output-path app --base-href /liq-lock/`. The build artifacts will be stored in the `app/`. Use the `--prod` flag for a production build.
 
@@ -29,4 +34,3 @@ Contributions are what make the open source community such an amazing place to b
 3. Commit your Changes (`git commit -m 'Add some SomeFeature'`)
 4. Push to the Branch (`git push origin feature/SomeFeature`)
 5. Open a Pull Request
-
