@@ -24,7 +24,7 @@ export class Lock {
     public index: number,
     public transfers: any[] | undefined, // 0: oldest, N: newest
     public owner: string,
-    public expirationTime: number,
+    public releaseTime: number,
     public token: Token,
     public value: string
   ) {
@@ -39,7 +39,7 @@ export class Lock {
   }
 
   isLocked() {
-    return this.expirationTime > Date.now();
+    return this.releaseTime > Date.now();
   }
 
 }
@@ -177,7 +177,7 @@ export class LiquidityLockerService {
             result.lockInitData.index,
             result.lockInitData.transfers,
             result.lock.owner,
-            parseInt(result.lock.expirationTime.toString()) * 1000,
+            parseInt(result.lock.releaseTime.toString()) * 1000,
             await this.connectService.getTokenInfo(result.lock.token),
             result.lock.value.toString()
           )
@@ -237,7 +237,7 @@ export class LiquidityLockerService {
           pLockInitData.index,
           pLockInitData.transfers,
           lock.owner,
-          parseInt(lock.expirationTime.toString()) * 1000,
+          parseInt(lock.releaseTime.toString()) * 1000,
           await this.connectService.getTokenInfo(lock.token),
           lock.value.toString()
         )
@@ -281,7 +281,7 @@ export class LiquidityLockerService {
       lockInitData.index,
       lockInitData.transfers,
       lock.owner,
-      parseInt(lock.expirationTime.toString()) * 1000,
+      parseInt(lock.releaseTime.toString()) * 1000,
       tokenInfo,
       lock.value.toString()
     );

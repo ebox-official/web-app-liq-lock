@@ -6,7 +6,7 @@
     <div class="text-md-end">
         <div>
             <div><small class="text-muted">Unlocking Time</small></div>
-            <span>{{ lock.expirationTime | formatDate }}
+            <span>{{ lock.releaseTime | formatDate }}
                 <i class="bi ms-2"
                     [ngClass]="{
                         'bi-lock-fill': lock.isLocked(),

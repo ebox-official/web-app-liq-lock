@@ -40,7 +40,7 @@ export class EditLockComponent implements OnInit {
       this.validatorsService.amountValidator(this.lock.token)
     ]);
 
-    const isoString = new Date(this.lock.expirationTime).toISOString()
+    const isoString = new Date(this.lock.releaseTime).toISOString()
     this.minDate = isoString.substring(0, (isoString.indexOf("T")|0) + 6|0);
     this.maxDate = "2025-01-01T01:01";
     this.lockExtendField = new FormControl("", [
