@@ -13,7 +13,7 @@
         <a class="btn btn-outline-primary" [routerLinkActive]="'active'" [routerLink]="['/referral']"><i class="bi bi-card-list me-2"></i>Referral Program</a>
     </li>
     <ng-container *ngIf="(testTokens$ | async)!.length">
-        <li class="nav-item">
+        <li class="nav-item mt-3">
             <a class="btn btn-outline-primary"
                 (click)="giveTestToken('Uni-LP', 0)"
                 [class.disabled]="interactingWithSmartContract"><i class="bi bi-coin me-2"></i>Get 100 Uni-LP</a>

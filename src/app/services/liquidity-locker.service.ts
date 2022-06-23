@@ -386,12 +386,12 @@ export class LiquidityLockerService {
     return receipt;
   }
 
-  async lockWithdraw(lock: Lock, _amount: string) {
+  async lockRelease(lock: Lock, _amount: string) {
 
     const amount = this.connectService.decimalToWei(_amount, lock.token.decimals);
 
     const tx = await this.liquidityLockerContract
-      .lockWithdraw(lock.index, amount);
+      .lockRelease(lock.index, amount);
     const receipt = await tx.wait();
     return receipt;
   }

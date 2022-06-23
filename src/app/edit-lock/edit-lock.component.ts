@@ -24,7 +24,7 @@ export class EditLockComponent implements OnInit {
   minDate: string;
   maxDate: string;
   lockTransferField: FormControl;
-  lockWithdrawField: FormControl;
+  lockReleaseField: FormControl;
 
   interactingWithSmartContract: boolean;
 
@@ -52,8 +52,8 @@ export class EditLockComponent implements OnInit {
       this.validatorsService.addressValidator()
     ]);
 
-    this.lockWithdrawField = new FormControl("", [
-      this.validatorsService.withdrawValidator(this.lock)
+    this.lockReleaseField = new FormControl("", [
+      this.validatorsService.releaseValidator(this.lock)
     ]);
 
     this.checkTokenAllowance();
@@ -97,7 +97,7 @@ export class EditLockComponent implements OnInit {
     this.checkTokenAllowance();
   }
 
-  setWithdrawPercentage(percentage: number) {
+  setReleasePercentage(percentage: number) {
 
     if (!this.lock.value) return;
 
@@ -107,8 +107,8 @@ export class EditLockComponent implements OnInit {
         value.multipliedBy(percentage).integerValue().toString(),
         this.lock.token.decimals
       );
-    this.lockWithdrawField.setValue(decimalValue);
-    this.lockWithdrawField.markAsDirty();
+    this.lockReleaseField.setValue(decimalValue);
+    this.lockReleaseField.markAsDirty();
   }
 
   async lockAdd() {
@@ -163,14 +163,14 @@ export class EditLockComponent implements OnInit {
     this.lockEdited.emit(true);
   }
 
-  async lockWithdraw() {
+  async lockRelease() {
     this.interactingWithSmartContract = true;
     try {
       this.toasterService.publish(
         ToastColor.warning,
-        "Withdrawing from lock..."
+        "Releasing from lock..."
       );
-      await this.liquidityLockerService.lockWithdraw(this.lock, this.lockWithdrawField.value);
+      await this.liquidityLockerService.lockRelease(this.lock, this.lockReleaseField.value);
     }
     catch (err) {
       this.toasterService.publish(ToastColor.danger, "Something went wrong!");
@@ -180,7 +180,7 @@ export class EditLockComponent implements OnInit {
 
     this.toasterService.publish(
       ToastColor.success,
-      "Successfully withdrawn from lock!"
+      "Successfully released from lock!"
     );
     this.interactingWithSmartContract = false;
 

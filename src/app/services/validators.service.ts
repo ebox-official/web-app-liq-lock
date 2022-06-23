@@ -45,7 +45,7 @@ export class ValidatorsService {
     }
   }
 
-  withdrawValidator(lock: Lock) {
+  releaseValidator(lock: Lock) {
     return (control: AbstractControl): ValidationErrors | null => {
       const requestedAmount = control.value;
       if (!requestedAmount || isNaN(requestedAmount)) return { invalidAmount: true };
