@@ -16,6 +16,10 @@ export class FormatMultiplierPipe implements PipeTransform {
     
     if (value === 0) return "0";
 
+	return Math.floor(value * 10000) / 10000;
+
+	//
+
     let e = Math.floor(Math.log10(value));
     let m;
     if (e < -8) {

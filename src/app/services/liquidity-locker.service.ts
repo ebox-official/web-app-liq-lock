@@ -6,6 +6,7 @@ import { Contract } from 'ethers';
 import { BehaviorSubject } from 'rxjs';
 import { MAX_VALUE } from '../data/constants';
 import { filter } from 'rxjs/operators';
+import { ethers } from "ethers";
 
 export class LockInitialData {
 
@@ -289,13 +290,23 @@ export class LiquidityLockerService {
 
   private async getLocksInitialData(address?: string) {
 
-    const LockCreateFilter = this.liquidityLockerContract.filters.LockCreate(null, address);
-    const LockTransferFilter = this.liquidityLockerContract.filters.LockTransfer();
+	let contract = this.liquidityLockerContract;
 
-    const createsTransfersPromise = Promise.all([
-      this.liquidityLockerContract.queryFilter(LockCreateFilter),
-      this.liquidityLockerContract.queryFilter(LockTransferFilter)
-    ]);
+	// Use different RPC URL for certain chains (due to limited block range on eth_getLogs on some node providers)
+	if (NETWORK_MAP[this.connectService.chainId$.getValue()].rpcUrlForLogs)
+		contract = new ethers.Contract(
+			this.liquidityLockerContractAddress,
+			LIQUIDITY_LOCKER_ABI,
+			new ethers.providers.JsonRpcProvider("https://polygon-mainnet.g.alchemy.com/v2/A7qv_2SwrZf2Ht507mc22GqWRRN-zOvt")
+		);
+
+	const LockCreateFilter = contract.filters.LockCreate(null, address);
+    const LockTransferFilter = contract.filters.LockTransfer();
+
+	const createsTransfersPromise = Promise.all([
+		contract.queryFilter(LockCreateFilter),
+		contract.queryFilter(LockTransferFilter)
+	]);
 
     const [ creates, transfers ] = await createsTransfersPromise;
 

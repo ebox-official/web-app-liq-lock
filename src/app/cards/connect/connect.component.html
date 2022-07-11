@@ -8,7 +8,7 @@
                     <img *ngIf="headerService.isDarkmode$ | async" height="48" src="assets/img/wallet/in-wallet-dark.svg" alt="in-wallet logo">
                     <img *ngIf="!(headerService.isDarkmode$ | async)" height="48" src="assets/img/wallet/in-wallet.svg" alt="in-wallet logo">
                 </div>
-                <span>In-wallet Provider</span>
+                <span>Default Browser Wallet</span>
             </li>
             <li class="list-group-item" (click)="connect('BINANCE_CHAIN')">
                 <div class="wallet-icon-wrapper">

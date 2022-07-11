@@ -42,6 +42,7 @@ const NETWORK_MAP: any = {
         contracts: {
             liquidityLocker: "0xae0E4FADb6078dc6AB48d3963677F33b5C36a2B0"
         }
+//		rpcUrlForLogs: "https://bsc-mainnet.gateway.pokt.network/v1/lb/6136201a7bad1500343e248d"
     },
     // "97": {
     //     name: "BSC Testnet",
@@ -56,7 +57,8 @@ const NETWORK_MAP: any = {
         accountScannerUrl: (address: string) => `https://polygonscan.com/address/${address}`,
         contracts: {
             liquidityLocker: "0x7Ce09E06d7F22c3dce3Bd370CFD8BfFfc521bD05"
-        }
+        },
+		rpcUrlForLogs: "https://polygon-mainnet.g.alchemy.com/v2/A7qv_2SwrZf2Ht507mc22GqWRRN-zOvt"
     },
     // "80001": {
     //     name: "Polygon Testnet",
