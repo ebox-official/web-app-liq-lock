@@ -7,6 +7,7 @@ import { BehaviorSubject } from 'rxjs';
 import { MAX_VALUE } from '../data/constants';
 import { filter } from 'rxjs/operators';
 import { ethers } from "ethers";
+import { HttpClient } from '@angular/common/http';
 
 export class LockInitialData {
 
@@ -75,7 +76,8 @@ export class LiquidityLockerService {
   fee: number;
 
   constructor(
-    private connectService: ConnectService
+    private connectService: ConnectService,
+	private http: HttpClient
   ) {
 
     this.locksInitialData = [];
@@ -289,34 +291,39 @@ export class LiquidityLockerService {
   }
 
   private async getLocksInitialData(address?: string) {
+	
+	var creates;
+	var transfers;
 
-	let contract = this.liquidityLockerContract;
+	var error = false;
+	do {
+		try {
+			var formData = new FormData();
+			formData.append("action", "get_event");
+			formData.append("chain_id", this.connectService.chainId$.getValue());
+			formData.append("event", "LockCreate");
+			creates = (await this.http.post<any>("https://www.ebox.io/liq-lock/liq_lock_events.php", formData).toPromise()).result;
 
-	// Use different RPC URL for certain chains (due to limited block range on eth_getLogs on some node providers)
-	if (NETWORK_MAP[this.connectService.chainId$.getValue()].rpcUrlForLogs)
-		contract = new ethers.Contract(
-			this.liquidityLockerContractAddress,
-			LIQUIDITY_LOCKER_ABI,
-			new ethers.providers.JsonRpcProvider("https://polygon-mainnet.g.alchemy.com/v2/A7qv_2SwrZf2Ht507mc22GqWRRN-zOvt")
-		);
+			formData = new FormData();
+			formData.append("action", "get_event");
+			formData.append("chain_id", this.connectService.chainId$.getValue());
+			formData.append("event", "LockTransfer");
+			transfers = (await this.http.post<any>("https://www.ebox.io/liq-lock/liq_lock_events.php", formData).toPromise()).result;
+		} catch {
+			error = true;
+		}
+	} while (error);
 
-	const LockCreateFilter = contract.filters.LockCreate(null, address);
-    const LockTransferFilter = contract.filters.LockTransfer();
-
-	const createsTransfersPromise = Promise.all([
-		contract.queryFilter(LockCreateFilter),
-		contract.queryFilter(LockTransferFilter)
-	]);
-
-    const [ creates, transfers ] = await createsTransfersPromise;
+	if(address != undefined)
+		creates = creates.filter(function (_x: any) {return _x.returnValues.owner.toLowerCase() == address.toLowerCase()});
 
     // { [[index]]: [{ oldOwner, newOwner }] }
     const transfersMap: any = {};
     transfers.forEach((t: any) => {
-      transfersMap[t.args.index] = transfersMap[t.args.index] || [];
-      transfersMap[t.args.index].push({
-        oldOwner: t.args.oldOwner,
-        newOwner: t.args.newOwner
+      transfersMap[t.returnValues.index] = transfersMap[t.returnValues.index] || [];
+      transfersMap[t.returnValues.index].push({
+        oldOwner: t.returnValues.oldOwner,
+        newOwner: t.returnValues.newOwner
       });
     });
 
@@ -332,7 +339,7 @@ export class LiquidityLockerService {
     }
 
     for (const create of creates) {
-      const index = (create as any).args.index.toString();
+      const index = (create as any).returnValues.index.toString();
       if (!indices.has(index)) {
         indices.add(index);
       }
