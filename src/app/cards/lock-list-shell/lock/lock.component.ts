@@ -31,7 +31,8 @@ export class LockComponent implements OnInit {
     if (!lockIndexParam) throw new Error("Could not get lock ID.");
     this.lockIndex = parseInt(lockIndexParam);
 
-    this.shareLink = `${document.location.origin}/lock-list/find/${this.lockIndex}`;
+//	this.shareLink = `${document.location.origin}/${(document.location.hostname == "localhost" || document.location.hostname == "127.0.0.1") ? "" : "liq-lock/"}lock-list/find/${this.lockIndex}`;
+	this.shareLink = `${document.location.origin}/lock-list/find/${this.lockIndex}`;
   }
 
   ngOnInit() {
