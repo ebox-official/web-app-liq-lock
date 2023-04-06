@@ -187,7 +187,7 @@ export class ConnectService {
     formData.append("chain", this.chainId$.getValue());
 
     const userTokens: any[] = await this.http.post<any>(
-      "https://www.ebox.io/liq-lock/moralis.php",
+      "https://ebox.io/api/liq-lock/moralis.php",
       formData
     )
     .toPromise();

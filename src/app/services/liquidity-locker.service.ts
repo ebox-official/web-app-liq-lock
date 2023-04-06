@@ -302,13 +302,13 @@ export class LiquidityLockerService {
 			formData.append("action", "get_event");
 			formData.append("chain_id", this.connectService.chainId$.getValue());
 			formData.append("event", "LockCreate");
-			creates = (await this.http.post<any>("https://www.ebox.io/liq-lock/liq_lock_events.php", formData).toPromise()).result;
+			creates = (await this.http.post<any>("https://ebox.io/api/liq-lock/liq_lock_events.php", formData).toPromise()).result;
 
 			formData = new FormData();
 			formData.append("action", "get_event");
 			formData.append("chain_id", this.connectService.chainId$.getValue());
 			formData.append("event", "LockTransfer");
-			transfers = (await this.http.post<any>("https://www.ebox.io/liq-lock/liq_lock_events.php", formData).toPromise()).result;
+			transfers = (await this.http.post<any>("https://ebox.io/api/liq-lock/liq_lock_events.php", formData).toPromise()).result;
 		} catch {
 			error = true;
 		}

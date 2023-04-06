@@ -10,7 +10,7 @@ import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 })
 export class ReferralComponent implements OnInit {
 
-  url = "https://ebox.io/liq-lock/liq_lock_promo.php";
+  url = "https://ebox.io/api/liq-lock/liq_lock_promo.php";
   isLoading = false;
   shareLink: string;
 
